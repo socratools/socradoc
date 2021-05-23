@@ -313,6 +313,9 @@ void print_usage(const char *const prog)
 {
     printf("Usage: %s <command>\n"
            "\n"
+           "Select mixer channels to connect the to USB audio capture device\n"
+           "of a Soundcraft Notepad series mixer.\n"
+           "\n"
            "Commands:\n"
            "\n"
            "    --help     Print this message and exit.\n"

@@ -1,24 +1,25 @@
 scnp-cli
 ========
 
-A simple CLI written in C for controlling mixers from the [Soundcraft
-Notepad
+A simple CLI written in C for selecting the mixer channelsof the
+[Soundcraft Notepad
 series](https://www.soundcraft.com/en/product_families/notepad-series)
-of mixers:
+of mixer to connect to the USB audio capture device:
 
   * [Notepad-5](https://www.soundcraft.com/en/products/notepad-5)
   * [Notepad-8FX](https://www.soundcraft.com/en/products/notepad-8fx)
   * [Notepad-12FX](https://www.soundcraft.com/en/products/notepad-12fx)
 
-If you want a nice GUI to control your Notepad series mixer, go over
-to [soundcraft-utils](https://github.com/lack/soundcraft-utils) for a
+If you want a nice GUI for that, go over to
+[soundcraft-utils](https://github.com/lack/soundcraft-utils) for a
 nice GUI which even synchronizes between multiple
 instances. [soundcraft-utils](https://github.com/lack/soundcraft-utils)
 is written in Python and uses a D-Bus service to provide a better user
 experience across tool invocations.
 
-`scnp-cli` should be helpful if you do not want to install the whole
-Python software stack just to change the audio routing on the mixer.
+`scnp-cli` could be helpful if you do not want to install the whole
+Python software stack just to change the mixer's audio routing to the
+USB device.
 
 
 Runtime requirements
@@ -35,6 +36,9 @@ This is the output of `scnp-cli --help`:
 
 ```
 Usage: scnp-cli <command>
+
+Select mixer channels to connect the to USB audio capture device
+of a Soundcraft Notepad series mixer.
 
 Commands:
 
