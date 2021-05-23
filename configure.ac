@@ -5,9 +5,9 @@
 AC_PREREQ([2.69])
 AC_INIT([CLI for Soundcraft Notepad series mixers],
         [m4_esyscmd([./build-helpers/package-version . version-stamp])],
-        [BUG-REPORT-ADDRESS],
+        [https://github.com/ndim/scnp-cli/issues],
         [scnp-cli],
-        [PROJECT_URL])
+        [https://github.com/ndim/scnp-cli])
 AC_CONFIG_AUX_DIR([auto-aux])
 AC_CONFIG_MACRO_DIR([auto-m4])
 AC_CONFIG_SRCDIR([src/scnp-cli-main.c])
