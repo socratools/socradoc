@@ -1,0 +1,3 @@
+# -*- makefile -*-
+
+EXTRA_DIST += %reldir%/ndim-path-prog.m4

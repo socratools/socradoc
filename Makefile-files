@@ -1,0 +1,13 @@
+# -*- makefile -*-
+
+EXTRA_DIST += README.md
+
+if HAVE_MARKDOWN
+CLEANFILES  += README.html
+noinst_DATA += README.html
+
+.md.html:
+	$(MKDIR_P) $(@D)
+	$(MARKDOWN) -o $@ $<
+
+endif
