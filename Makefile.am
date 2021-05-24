@@ -6,6 +6,7 @@ check_PROGRAMS =
 check_SCRIPTS =
 BUILT_SOURCES =
 CLEANFILES =
+doc_DATA =
 EXTRA_DIST =
 man1_MANS =
 noinst_DATA =
