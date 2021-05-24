@@ -100,11 +100,14 @@ For building from a git source tree, you also need at least
 Building
 --------
 
-When building from a git source tree:
+When building from a git source tree (or one of the github "release"
+tarballs (`*.tar.gz`) or zipfiles (`*.zip`), which I wholeheartedly
+recommend to NOT use):
 
     autoreconf -vis .
 
-Then you can run the usual build commands
+Then you can run the usual build commands as if you had unpacked a
+proper dist tarball (`*.tar.xz`):
 
     ./configure
     make
