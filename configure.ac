@@ -29,9 +29,11 @@ subdir-objects
 
 AC_CANONICAL_HOST
 
+
+########################################################################
+# Checks for programs.
 ########################################################################
 
-# Checks for programs.
 AC_PROG_SED
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -41,24 +43,25 @@ AC_PROG_INSTALL
 m4_pattern_forbid([^NDIM_PATH_PROG])dnl
 NDIM_PATH_PROG([git])
 
+
+########################################################################
+# Checks for libraries.
 ########################################################################
 
-# Checks for libraries.
 m4_pattern_forbid([^PKG_CHECK_MODULES])dnl
 PKG_CHECK_MODULES([LIBUSB10], [libusb-1.0])
 
+
+########################################################################
+# Checks for header files.
 ########################################################################
 
-# Checks for header files.
 
+########################################################################
 # Checks for typedefs, structures, and compiler characteristics.
-
-# Checks for library functions.
-
 ########################################################################
 
 m4_pattern_forbid([^NDIM_CFLAGS_ADD])
-
 NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Werror])
 NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Wall])
 NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Wextra])
@@ -84,12 +87,23 @@ do
 done
 PEDANTIC_C11_CFLAGS="$ndim_new"
 
+
+########################################################################
+# Checks for library functions.
+########################################################################
+
+
+########################################################################
+# Conclude the Autoconf action
 ########################################################################
 
 AC_CONFIG_FILES([GNUmakefile])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
+
+########################################################################
+# Human readable (maybe even user readable!) summary
 ########################################################################
 
 cat<<EOF
