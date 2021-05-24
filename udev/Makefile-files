@@ -1,0 +1,28 @@
+# -*- makefile -*-
+
+# This is a well-known directory independent from our installation
+# prefix.
+
+# For system packages
+# udevrulesdir = /usr/lib/udev/rules.d
+
+# For local installs by the sysadmin
+udevrulesdir = /etc/udev/rules.d
+
+udevrules_files =
+udevrules_files += %reldir%/70-soundcraft-notepad.rules
+udevrules_files += %reldir%/80-soundcraft-notepad.rules
+
+EXTRA_DIST     += $(udevrules_files)
+
+install-udev-rules:
+	$(INSTALL)    -m 0755 -d "$(DESTDIR)$(udevrulesdir)"
+	@set -ex; for file in $(udevrules_files); do \
+	  if test -f "$$file"; then srcdir""; else srcdir="$(srcdir)"; fi; \
+          $(INSTALL) -C -m 0644 -t "$(DESTDIR)$(udevrulesdir)" "$$srcdir/$$file"; \
+	done
+
+uninstall-udev-rules:
+	@set -ex; for file in $(udevrules_files); do \
+	  rm -f "$(DESTDIR)$(udevrulesdir)/$$(basename "$$file")"; \
+	done

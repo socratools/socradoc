@@ -117,6 +117,33 @@ or for an out of source tree build
     make
     make install
 
+Note that you do not need to install `scnp-cli` to run it. Just run it
+from the build dir if that suits you better than installing it.
+
 Note that if you run `make check` or `make distcheck` and there is
 actually a Notepad series mixer connected, one of the test cases will
 write to the device and possibly change its settings.
+
+
+Device permission setup using udev
+==================================
+
+We have two special make targets to install and uninstall the udev
+rules files to the well-known system directory for udev rules
+`/etc/udev/rules.d` (for local installations):
+
+    sudo make install-udev-rules
+    sudo make uninstall-udev-rules
+
+Check whether our example files work on your system. One rules file
+uses the uaccess mechanism to give access to users running local
+sessions, and the other rules file gives access to all users who are
+members of the `audio` user group.
+
+You can very well have both installed at the same time.
+
+If you package this (`*.deb` or `*.rpm` or similar), I suggest
+changing the `make install` command to install the udev rules similar
+to the following command:
+
+    make DESTDIR=... udevrulesdir=/usr/lib/udev/rules.d install install-udev-rules

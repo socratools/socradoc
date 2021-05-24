@@ -18,6 +18,7 @@ include include/Makefile-files
 include m4/Makefile-files
 include src/Makefile-files
 include test/Makefile-files
+include udev/Makefile-files
 
 sed_commands =
 sed_commands += -e 's|[@]abs_top_builddir@|$(abs_top_builddir)|g'
