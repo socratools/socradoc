@@ -128,22 +128,43 @@ write to the device and possibly change its settings.
 Device permission setup using udev
 ==================================
 
-We have two special make targets to install and uninstall the udev
-rules files to the well-known system directory for udev rules
-`/etc/udev/rules.d` (for local installations):
+`scnp-cli` writes to the mixer device by opening the device special
+file connected to the mixer, which is called something like
+`/dev/bus/usb/006/004` and by default cannot be written to by ordinary
+users.
+
+So we need to tell the system that the next time a mixer device is
+plugged in, it should set the permissions of the device special file
+such that an ordinary user can access it.
+
+To help with that, we have two udev rules files:
+
+  * 70-soundcraft-notepad.rules 
+    Uses the `TAG+="uaccess"` mechanism to allow access users locally
+    logged into a login session.
+
+  * 80-soundcraft-notepad.rules 
+    Sets the device file's group to `audio` to allow all group members
+    access.
+
+Check whether these udev rule files are suitable for your system
+before installing them. You can very well have both installed at the
+same time.
+
+We have two special make targets to help with installing and
+uninstalling the udev rules files to the well-known system directory
+for udev rules `/etc/udev/rules.d` for local installations:
 
     sudo make install-udev-rules
     sudo make uninstall-udev-rules
 
-Check whether our example files work on your system. One rules file
-uses the uaccess mechanism to give access to users running local
-sessions, and the other rules file gives access to all users who are
-members of the `audio` user group.
-
-You can very well have both installed at the same time.
-
-If you package this (`*.deb` or `*.rpm` or similar), I suggest
-changing the `make install` command to install the udev rules similar
-to the following command:
+If you package `scnp-cli` (e.g. as `*.deb` or `*.rpm`), I suggest you
+change the usual `make install` command to install the udev rules
+similar to the following command:
 
     make DESTDIR=... udevrulesdir=/usr/lib/udev/rules.d install install-udev-rules
+
+In any case, if you have installed or uninstalled and udev rules, the
+permissions of any existing device special files do not change
+according to the new set of rules until you **unplug and re-plug the
+USB cable** to your mixer device(s).
