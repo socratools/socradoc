@@ -25,8 +25,8 @@ USB device.
 Runtime requirements
 --------------------
 
-Unless you have statically linked `scnp-cli`, you need only a libc and
-`libusb-1.0` for running `scnp-cli`.
+Unless you have statically linked `scnp-cli`, you need a libc (glibc?)
+and `libusb-1.0` for running `scnp-cli`.
 
 
 Usage
