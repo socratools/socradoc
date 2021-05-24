@@ -42,7 +42,7 @@ of a Soundcraft Notepad series mixer.
 
 Commands:
 
-    --help     Print this message and exit.
+    --help     Print this usage message and exit.
 
     --version  Print version message and exit.
 

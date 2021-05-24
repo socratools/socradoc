@@ -339,7 +339,7 @@ void print_usage(const char *const prog)
            "\n"
            "Commands:\n"
            "\n"
-           "    --help     Print this message and exit.\n"
+           "    --help     Print this usage message and exit.\n"
            "\n"
            "    --version  Print version message and exit.\n"
            "\n"
