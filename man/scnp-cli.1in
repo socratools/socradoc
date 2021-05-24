@@ -22,6 +22,22 @@ scnp \- Soundcraft Notepad series mixer CLI
 .B scnp\-cli
 .B audio\-routing
 .I N
+.br
+.B scnp\-cli
+.B ducker\-off
+.br
+.B scnp\-cli
+.B ducker\-on
+.I INPUTS
+.IR RELEASE ms
+.br
+.B scnp\-cli
+.B ducker\-range
+.IR HEX_VALUE | RANGE dB
+.br
+.B scnp\-cli
+.B ducker\-threshold
+.IR HEX_VALUE | THRESH dB
 .\"
 .\" ====================================================================
 .\"
@@ -43,25 +59,46 @@ Print version message and exit.
 Find a supported device, and set its audio sources. There must be exactly one supported device connected. The valid source numbers \fIN\fR are specific to the device:
 .RS
 .TP
-.BR NOTEPAD\-5\  "channels 1+2 of 2-channel audio capture device"
+.BR NOTEPAD\-5\  "(channels 1+2 of 2-channel audio capture device)"
     \fI0\fR  MIC+LINE 1+2
     \fI1\fR  LINE 2+3
     \fI2\fR  LINE 4+5
     \fI3\fR  MASTER L+R
 .TP
-.BR NOTEPAD\-8FX\  "channels 1+2 of 2-channel audio capture device"
+.BR NOTEPAD\-8FX\  "(channels 1+2 of 2-channel audio capture device)"
     \fI0\fR  MIC 1+2
     \fI1\fR  LINE 3+4
     \fI2\fR  LINE 5+6
     \fI3\fR  MASTER L+R
 .TP
-.BR NOTEPAD\-12FX\  "channels 3+4 of 4-channel audio capture device"
+.BR NOTEPAD\-12FX\  "(channels 3+4 of 4-channel audio capture device)"
     \fI0\fR  MIC 3+4
     \fI1\fR  LINE 5+6
     \fI2\fR  LINE 7+8
     \fI3\fR  MASTER L+R
 .PP
 Note that on the \fBNOTEPAD-12FX\fR 4-channel audio capture device, capture device channels 1+2 are always fed from mixer CH 1+2.
+.RE
+.TP
+.BI ducker\-off
+Turn the ducker off.
+.TP
+.R \fBducker\-on\fR \fIINPUTS\fR \fIRELEASE\fRms
+Turn the ducker on and set the following values:
+  INPUTS (range 0..15) is a bitmask for the input \fBSelection\fR
+    0 = no inputs watched, 15 = all four inputs watched
+  RELEASE (range 0..5000) is a the \fBrelease\fR time in ms
+    0 = release time 0, 5000 = release time 5000ms=5s
+.TP
+.R \fBducker\-range\fR \fIHEX_VALUE\fR|\fIRANGE\fRdB
+Set the \fBduck range\fR to the given value.
+Valid range is 0dB to 90dB, or 0 to 0x1fffffff.
+It may be best to only use this while ducker is on.
+.TP
+.R \fBducker\-threshold\fR \fIHEX_VALUE\fR|\fITHRESH\fRdB
+Set the \fBthreshold\fR to the given value.
+Valid range is -60dB to 0dB, or 0x000000 to 0x7fffff.
+It may be best to only use this while ducker is on.
 .\"
 .\" ====================================================================
 .\"

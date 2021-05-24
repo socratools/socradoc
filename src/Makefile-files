@@ -9,8 +9,14 @@ scnp_cli_SOURCES   =
 
 scnp_cli_SOURCES  += %reldir%/scnp-cli-main.c
 
+# for reallocarray(3)
+scnp_cli_CPPFLAGS += -D_DEFAULT_SOURCE
+
 scnp_cli_CPPFLAGS += -I$(top_builddir)/include
 scnp_cli_CFLAGS   += $(PEDANTIC_C11_CFLAGS)
 
 scnp_cli_CFLAGS   += $(LIBUSB10_CFLAGS)
 scnp_cli_LDADD    += $(LIBUSB10_LIBS)
+
+# TODO: Is this always necessary for floor()?
+scnp_cli_LDADD    += -lm

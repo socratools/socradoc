@@ -27,6 +27,7 @@
 
 #include <errno.h>
 #include <limits.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -81,25 +82,29 @@
 typedef struct {
     uint16_t idProduct;
     const char *const name;
+    bool ducker;
     const char *const source_descr;
     const char *const sources[SOURCES_MAX];
 } notepad_device_T;
 
 
 static
-const notepad_device_T handled_devices[] = {
+const notepad_device_T supported_devices[] = {
     { 0x0030,
       "NOTEPAD-5",
+      false, /* no ducker */
       "channels 1+2 of 2-channel audio capture device",
       {"MIC+LINE 1+2", "LINE 2+3", "LINE 4+5", "MASTER L+R"}},
 
     { 0x0031,
       "NOTEPAD-8FX",
+      false, /* no ducker... but REALLY? */
       "channels 1+2 of 2-channel audio capture device",
       {"MIC 1+2", "LINE 3+4", "LINE 5+6", "MASTER L+R"}},
 
     { 0x0032,
       "NOTEPAD-12FX",
+      true, /* supports ducker */
       "channels 3+4 of 4-channel audio capture device",
       {"MIC 3+4", "LINE 5+6", "LINE 7+8", "MASTER L+R"}},
 
@@ -109,20 +114,20 @@ const notepad_device_T handled_devices[] = {
 
 
 static
-void get_matching_devices(libusb_device ***device_list, size_t *device_count)
-    __attribute__(( nonnull(1), nonnull(2) ));
+ssize_t supported_device_list(libusb_device ***device_list)
+    __attribute__(( nonnull(1) ));
 
 static
-void get_matching_devices(libusb_device ***device_list, size_t *device_count)
+ssize_t supported_device_list(libusb_device ***device_list)
 {
-    // printf("get_matching_devices\n");
+    // printf("get_supported_device_list\n");
 
     libusb_device **ret_list = calloc(128, sizeof(libusb_device *));
     if (ret_list == NULL) {
         perror("calloc libusb_device list");
         exit(EXIT_FAILURE);
     }
-    size_t ret_count = 0;
+    ssize_t ret_count = 0;
 
     libusb_device **devices = NULL;
     const ssize_t luret_get_device_list =
@@ -141,8 +146,8 @@ void get_matching_devices(libusb_device ***device_list, size_t *device_count)
             libusb_get_device_descriptor(dev, &desc);
         LIBUSB_OR_FAIL(luret_get_dev_descr, "libusb_get_device_descriptor");
 
-        for (int k=0; handled_devices[k].idProduct != 0; ++k) {
-            const notepad_device_T *const np_dev = &handled_devices[k];
+        for (int k=0; supported_devices[k].idProduct != 0; ++k) {
+            const notepad_device_T *const np_dev = &supported_devices[k];
             if ((0x05fc == desc.idVendor) &&
                 (np_dev->idProduct == desc.idProduct)) {
 
@@ -185,8 +190,18 @@ void get_matching_devices(libusb_device ***device_list, size_t *device_count)
     }
     libusb_free_device_list(devices, 1);
 
+    COND_OR_FAIL(ret_count > 0, "device number overflow... uhm what?");
+
+    /* NULL terminate list like the libusb_get_device_list retval */
+    ret_list[ret_count] = NULL;
+
+    /* reduce the memory size to what we actually use */
+    ret_list = reallocarray(ret_list, ((size_t)ret_count)+1,
+                            sizeof(libusb_device *));
+    COND_OR_FAIL(ret_list != NULL, "reallocarray");
+
     *device_list = ret_list;
-    *device_count = ret_count;
+    return ret_count;
 }
 
 
@@ -196,9 +211,9 @@ const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct);
 static
 const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct)
 {
-    for (size_t i=0; handled_devices[i].idProduct != 0; ++i) {
-        if (idProduct == handled_devices[i].idProduct) {
-            return &handled_devices[i];
+    for (size_t i=0; supported_devices[i].idProduct != 0; ++i) {
+        if (idProduct == supported_devices[i].idProduct) {
+            return &supported_devices[i];
         }
     }
     return NULL;
@@ -215,10 +230,12 @@ void device_send_ctrl_message(libusb_device *dev,
                               uint8_t *data, const size_t data_size)
 {
     COND_OR_FAIL(data_size < UINT16_MAX, "data_size exceeds uint16_t range");
-    COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
     const uint16_t u16_data_size = (uint16_t) data_size;
 
-    // printf("device_send_ctrl_message(%p, %p)\n", (void *)dev, (void *)data);
+    COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
+    printf("device_send_ctrl_message(device, {%02x %02x %02x %02x %02x %02x %02x %02x})\n",
+           data[0], data[1], data[2], data[3],
+           data[4], data[5], data[6], data[7]);
 
     libusb_device_handle *dev_handle;
     const int luret_open =
@@ -242,21 +259,16 @@ void device_send_ctrl_message(libusb_device *dev,
 
 
 static
-void device_audio_routing(libusb_device *dev, const uint8_t src_idx)
-    __attribute__(( nonnull(1) ));
+void device_audio_routing(libusb_device *dev,
+                          const notepad_device_T *const notepad_device,
+                          const uint8_t src_idx)
+    __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_audio_routing(libusb_device *dev, const uint8_t src_idx)
+void device_audio_routing(libusb_device *dev,
+                          const notepad_device_T *const notepad_device,
+                          const uint8_t src_idx)
 {
-    struct libusb_device_descriptor desc;
-    const int luret_get_dev_descr =
-        libusb_get_device_descriptor(dev, &desc);
-    LIBUSB_OR_FAIL(luret_get_dev_descr, "libusb_get_device_descriptor");
-
-    const notepad_device_T *const notepad_device =
-        notepad_device_from_idProduct(desc.idProduct);
-    COND_OR_FAIL(notepad_device != NULL, "unhandled idProduct");
-
     printf("Setting USB audio source to %d (%s) for device %s\n",
 	   src_idx, notepad_device->sources[src_idx], notepad_device->name);
 
@@ -275,20 +287,225 @@ void device_audio_routing(libusb_device *dev, const uint8_t src_idx)
 
 
 static
-void command_audio_routing(const uint8_t source_index);
+void device_ducker_off(libusb_device *dev,
+                        const notepad_device_T *const notepad_device)
+    __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void command_audio_routing(const uint8_t source_index)
+void device_ducker_off(libusb_device *device,
+                        const notepad_device_T *const notepad_device)
 {
-    // printf("command_audio_routing(%u)\n", source_index);
+    printf("FIXME ducker_off %s\n", notepad_device->name);
 
+    uint8_t data[8];
+    data[0] = 0x00;
+    data[1] = 0x00;
+    data[2] = 0x02;
+    data[3] = 0x80;
+    data[4] = 0x00;
+    data[5] = 0x00;
+    data[6] = 0x00;
+    data[7] = 0x00;
+
+    device_send_ctrl_message(device, data, sizeof(data));
+}
+
+
+static
+void device_ducker_on(libusb_device *device,
+                       const notepad_device_T *const notepad_device,
+                       const uint8_t inputs, const uint16_t release_ms)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+void device_ducker_on(libusb_device *device,
+                       const notepad_device_T *const notepad_device,
+                       const uint8_t inputs, const uint16_t release_ms)
+{
+    COND_OR_FAIL(inputs < 16, "inputs bitmap out of range (0b0000 to 0b1111)");
+    COND_OR_FAIL(release_ms <= 5000, "release_ms out of range (0 to 5000ms)");
+
+    printf("FIXME ducker_on inputs=%u release_ms=%u %s\n",
+           inputs, release_ms, notepad_device->name);
+
+    uint8_t data[8];
+    data[0] = 0x00;
+    data[1] = 0x00;
+    data[2] = 0x02;
+    data[3] = 0x80;
+    data[4] = 0x01;
+    data[5] = inputs;
+    data[6] = ((release_ms>>8) & 0xff);
+    data[7] = ((release_ms>>0) & 0xff);
+
+    device_send_ctrl_message(device, data, sizeof(data));
+}
+
+
+static
+void device_ducker_range(libusb_device *device,
+                         const notepad_device_T *const notepad_device,
+                         const uint32_t range_value)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+void device_ducker_range(libusb_device *device,
+                         const notepad_device_T *const notepad_device,
+                         const uint32_t range_value)
+{
+    COND_OR_FAIL(range_value <= 0x1fffffff,
+                 "ducker range value outside of numeric range");
+
+    printf("FIXME ducker_range range=0x%x=%u %s\n",
+           range_value, range_value, notepad_device->name);
+
+    uint8_t data[8];
+    data[0] = 0x00;
+    data[1] = 0x00;
+    data[2] = 0x02;
+    data[3] = 0x81;
+    data[4] = ((range_value>>24) & 0xff);
+    data[5] = ((range_value>>16) & 0xff);
+    data[6] = ((range_value>> 8) & 0xff);
+    data[7] = ((range_value>> 0) & 0xff);
+
+    device_send_ctrl_message(device, data, sizeof(data));
+}
+
+
+static
+void device_ducker_threshold(libusb_device *device,
+                             const notepad_device_T *const notepad_device,
+                             const uint32_t thresh_value)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+void device_ducker_threshold(libusb_device *device,
+                             const notepad_device_T *const notepad_device,
+                             const uint32_t thresh_value)
+{
+    COND_OR_FAIL(thresh_value <= 0x007fffff,
+                 "ducker threshold value outside of numeric range");
+
+    printf("FIXME ducker_threshold thresh=%u %s\n",
+           thresh_value, notepad_device->name);
+
+    uint8_t data[8];
+    data[0] = 0x00;
+    data[1] = 0x00;
+    data[2] = 0x02;
+    data[3] = 0x82;
+    data[4] = ((thresh_value>>24) & 0xff);
+    data[5] = ((thresh_value>>16) & 0xff);
+    data[6] = ((thresh_value>> 8) & 0xff);
+    data[7] = ((thresh_value>> 0) & 0xff);
+
+    device_send_ctrl_message(device, data, sizeof(data));
+}
+
+
+typedef union {
+    struct {
+        uint8_t source_index;
+    } audio_routing;
+
+    struct {
+        uint8_t inputs;
+        uint16_t release_ms;
+    } ducker_on;
+
+    struct {
+        uint32_t range;
+    } ducker_range;
+
+    struct {
+        uint32_t thresh;
+    } ducker_threshold;
+} command_params_T;
+
+
+typedef void (*command_func_T)(libusb_device *device,
+                               const notepad_device_T *const notepad_device,
+                               command_params_T *params);
+
+
+static
+void commandfunc_audio_routing(libusb_device *device,
+                               const notepad_device_T *const notepad_device,
+                               command_params_T *params)
+{
+    device_audio_routing(device, notepad_device,
+                         params->audio_routing.source_index);
+}
+
+
+static
+void commandfunc_ducker_off(libusb_device *device,
+                             const notepad_device_T *const notepad_device,
+                             command_params_T *params __attribute__(( unused )) )
+{
+    /* TODO: Move this check to device list generation code */
+    COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
+
+    device_ducker_off(device, notepad_device);
+}
+
+
+static
+void commandfunc_ducker_on(libusb_device *device,
+                            const notepad_device_T *const notepad_device,
+                            command_params_T *params)
+{
+    /* TODO: Move this check to device list generation code */
+    COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
+
+    device_ducker_on(device, notepad_device,
+                      params->ducker_on.inputs,
+                      params->ducker_on.release_ms);
+}
+
+
+static
+void commandfunc_ducker_range(libusb_device *device,
+                              const notepad_device_T *const notepad_device,
+                              command_params_T *params)
+{
+    /* TODO: Move this check to device list generation code */
+    COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
+
+    device_ducker_range(device, notepad_device,
+                        params->ducker_range.range);
+}
+
+
+static
+void commandfunc_ducker_threshold(libusb_device *device,
+                                  const notepad_device_T *const notepad_device,
+                                  command_params_T *params)
+{
+    /* TODO: Move this check to device list generation code */
+    COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
+
+    device_ducker_threshold(device, notepad_device,
+                            params->ducker_threshold.thresh);
+}
+
+
+static
+void run_command(command_func_T command_func,
+                 command_params_T *command_params)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+void run_command(command_func_T command_func,
+                 command_params_T *command_params)
+{
     const int luret_init =
         libusb_init(NULL);
     LIBUSB_OR_FAIL(luret_init, "libusb_init");
 
     libusb_device **dev_list;
-    size_t dev_count;
-    get_matching_devices(&dev_list, &dev_count);
+    ssize_t dev_count = supported_device_list(&dev_list);
 
     if (dev_count == 0) {
         fprintf(stderr, "No Notepad devices found\n");
@@ -299,9 +516,20 @@ void command_audio_routing(const uint8_t source_index)
         exit(EXIT_FAILURE);
     }
 
-    device_audio_routing(dev_list[0], source_index);
+    libusb_device *device = dev_list[0];
 
-    for (size_t i=0; i<dev_count; ++i) {
+    struct libusb_device_descriptor desc;
+    const int luret_get_dev_descr =
+        libusb_get_device_descriptor(device, &desc);
+    LIBUSB_OR_FAIL(luret_get_dev_descr, "libusb_get_device_descriptor");
+
+    const notepad_device_T *const notepad_device =
+        notepad_device_from_idProduct(desc.idProduct);
+    COND_OR_FAIL(notepad_device != NULL, "unhandled idProduct");
+
+    command_func(device, notepad_device, command_params);
+
+    for (ssize_t i=0; i<dev_count; ++i) {
         libusb_unref_device(dev_list[i]);
     }
 
@@ -366,17 +594,37 @@ void print_usage(const char *const prog)
            "               The valid source numbers are specific to the device:\n"
            "\n",
            prog);
-    for (int i=0; handled_devices[i].idProduct != 0; ++i) {
+    for (int i=0; supported_devices[i].idProduct != 0; ++i) {
         printf("               %s %s\n",
-               handled_devices[i].name, handled_devices[i].source_descr);
+               supported_devices[i].name, supported_devices[i].source_descr);
         for (int k=0; k<SOURCES_MAX; k++) {
             printf("                 %d  %s\n",
-                   k, handled_devices[i].sources[k]);
+                   k, supported_devices[i].sources[k]);
         }
         printf("\n");
     }
     printf("               Note that on the NOTEPAD-12FX 4-channel audio capture device,\n"
            "               capture device channels 1+2 are always fed from mixer CH 1+2.\n"
+           "\n"
+           "    ducker-off\n"
+           "               Turn the ducker off.\n"
+           "\n"
+           "    ducker-on <INPUTS> <RELEASE>ms\n"
+           "               Turn the ducker on and set the following values:\n"
+           "                 INPUTS (range 0..15) is a bitmask for the input \"selection\"\n"
+           "                         0 = no inputs watched, 15 = all four inputs watched\n"
+           "                 RELEASE (range 0..5000) is a the \"release\" time in ms\n"
+           "                         0 = release time 0, 5000 = release time 5000ms=5s\n"
+           "\n"
+           "    ducker-range <HEX_VALUE>|<RANGE>dB\n"
+           "               Set the \"duck range\" to the given value.\n"
+           "               Valid range is 0dB to 90dB, or 0 to 0x1fffffff.\n"
+           "               It may be best to only use this while ducker is on.\n"
+           "\n"
+           "    ducker-threshold <HEX_VALUE>|<THRESH>dB\n"
+           "               Set the \"threshold\" to the given value.\n"
+           "               Valid range is -60dB to 0dB, or 0x000000 to 0x7fffff.\n"
+           "               It may be best to only use this while ducker is on.\n"
            "\n"
            "Example:\n"
            "\n"
@@ -426,7 +674,7 @@ int parse_cmdline(const int argc, const char *const argv[])
     const char *const prog = arg0_to_prog(argv[0]);
 
     COND_OR_RETURN(argc >= 2, "too few command line arguments");
-    COND_OR_RETURN(argc <= 3, "too man command line arguments");
+    COND_OR_RETURN(argc <= 4, "too many command line arguments");
 
     if (false) {
         /* nothing */
@@ -466,7 +714,207 @@ int parse_cmdline(const int argc, const char *const argv[])
         COND_OR_RETURN(source_index < SOURCES_MAX,
                        "sources index must be less than 4");
 
-        command_audio_routing(source_index);
+        command_params_T params;
+        params.audio_routing.source_index = source_index;
+        run_command(commandfunc_audio_routing, &params);
+
+        return EXIT_SUCCESS;
+    } else if ((argc == 2) && (strcmp(argv[1], "ducker-off") == 0)) {
+        command_params_T params;
+        /* no params needed to turn off ducker  */
+        run_command(commandfunc_ducker_off, &params);
+
+        return EXIT_SUCCESS;
+    } else if ((argc == 4) && (strcmp(argv[1], "ducker-on") == 0)) {
+        command_params_T params;
+
+        if (true) {
+            char *p = NULL;
+            errno = 0;
+            if (*(argv[2]) == '\0') {
+                fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+                return EXIT_FAILURE;
+            }
+            const long lval = strtol(argv[2], &p, 0);
+            if ((p == NULL) || (*p != '\0')) {
+                fprintf(stderr, "Fatal: Error converting number\n");
+                return EXIT_FAILURE;
+            }
+            if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+                fprintf(stderr, "Fatal: Error converting number: number range\n");
+                return EXIT_FAILURE;
+            }
+            if (lval < 0) {
+                fprintf(stderr, "Fatal: Error converting number: negative\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > UINT8_MAX) {
+                fprintf(stderr, "Fatal: Error converting number: too large\n");
+                return EXIT_FAILURE;
+            }
+            /* range check input_set */
+            if (lval > 15) {
+                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+                return EXIT_FAILURE;
+            }
+            params.ducker_on.inputs = (uint8_t) lval;
+        }
+
+        if (true) {
+            char *p = NULL;
+            errno = 0;
+            if (*(argv[3]) == '\0') {
+                fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+                return EXIT_FAILURE;
+            }
+            const long lval = strtol(argv[3], &p, 10);
+            if (p == NULL) {
+                fprintf(stderr, "Fatal: Error converting number\n");
+                return EXIT_FAILURE;
+            }
+            if (strcmp(p, "ms") != 0) {
+                fprintf(stderr, "Fatal: Missing unit (ms)\n");
+                return EXIT_FAILURE;
+            }
+            if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+                fprintf(stderr, "Fatal: Error converting number: number range\n");
+                return EXIT_FAILURE;
+            }
+            if (lval < 0) {
+                fprintf(stderr, "Fatal: Error converting number: negative\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > UINT16_MAX) {
+                fprintf(stderr, "Fatal: Error converting number: too large\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > 5000L) {
+                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+                return EXIT_FAILURE;
+            }
+            params.ducker_on.release_ms = (uint16_t) lval;
+        }
+        run_command(commandfunc_ducker_on, &params);
+
+        return EXIT_SUCCESS;
+    } else if ((argc == 3) && (strcmp(argv[1], "ducker-range") == 0)) {
+        command_params_T params;
+
+        char *p = NULL;
+        errno = 0;
+        if (*(argv[2]) == '\0') {
+            fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+            return EXIT_FAILURE;
+        }
+        const long lval = strtol(argv[2], &p, 0);
+        if (p == NULL) {
+            fprintf(stderr, "Fatal: Error converting number\n");
+            return EXIT_FAILURE;
+        }
+        if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+            fprintf(stderr, "Fatal: Error converting number: number range\n");
+            return EXIT_FAILURE;
+        }
+
+        if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
+            if (lval < 0) {
+                fprintf(stderr, "Fatal: Error converting number: negative\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > UINT32_MAX) {
+                fprintf(stderr, "Fatal: Error converting number: too large\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > 90) {
+                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+                return EXIT_FAILURE;
+            }
+            /* value range is now 0 .. 90 including */
+            const double fmax   = 0x1fffffff;
+            const double fsteps = 90;
+            const double fval   = (double) lval;
+            const double frange = floor(fval * fmax / fsteps);
+            const uint32_t u32range = (uint32_t) frange;
+            params.ducker_range.range = u32range;
+        } else if (*p == '\0') { /* integer without a unit */
+            if (lval < 0) {
+                fprintf(stderr, "Fatal: Error converting number: negative\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > UINT32_MAX) {
+                fprintf(stderr, "Fatal: Error converting number: too large\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > 0x1fffffff) {
+                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+                return EXIT_FAILURE;
+            }
+            params.ducker_range.range = (uint32_t) lval;
+        } else {
+            fprintf(stderr, "Fatal: Invalid unit (must be integer or integer with dB)\n");
+            return EXIT_FAILURE;
+        }
+
+        run_command(commandfunc_ducker_range, &params);
+
+        return EXIT_SUCCESS;
+    } else if ((argc == 3) && (strcmp(argv[1], "ducker-threshold") == 0)) {
+        command_params_T params;
+
+        char *p = NULL;
+        errno = 0;
+        if (*(argv[2]) == '\0') {
+            fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+            return EXIT_FAILURE;
+        }
+        const long lval = strtol(argv[2], &p, 0);
+        if (p == NULL) {
+            fprintf(stderr, "Fatal: Error converting number\n");
+            return EXIT_FAILURE;
+        }
+        if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+            fprintf(stderr, "Fatal: Error converting number: number range\n");
+            return EXIT_FAILURE;
+        }
+
+        if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
+            if (lval < -60) {
+                fprintf(stderr, "Fatal: Error converting number: below -60dB\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > 0) {
+                fprintf(stderr, "Fatal: Error converting number: above 0dB\n");
+                return EXIT_FAILURE;
+            }
+            /* value range is now -60 .. 0 including */
+            const double fmax   = 0x7fffff;
+            const double fsteps = 60;
+            const double fval   = (double) (lval+60);
+            const double fthresh = floor(fval * fmax / fsteps);
+            const uint32_t u32thresh = (uint32_t) fthresh;
+
+            /* FIXME: thresh value 0x000000 basically means continually-ducked */
+            params.ducker_threshold.thresh = u32thresh;
+        } else if (*p == '\0') { /* integer without a unit */
+            if (lval < 0) {
+                fprintf(stderr, "Fatal: Error converting number: negative\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > UINT32_MAX) {
+                fprintf(stderr, "Fatal: Error converting number: too large\n");
+                return EXIT_FAILURE;
+            }
+            if (lval > 0x1fffffff) {
+                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+                return EXIT_FAILURE;
+            }
+            params.ducker_threshold.thresh = (uint32_t) lval;
+        } else {
+            fprintf(stderr, "Fatal: Invalid unit (must be integer or integer with dB)\n");
+            return EXIT_FAILURE;
+        }
+        run_command(commandfunc_ducker_threshold, &params);
+
         return EXIT_SUCCESS;
     } else {
         fprintf(stderr, "Fatal: Unhandled command line argument(s)\n");

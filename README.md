@@ -72,6 +72,26 @@ Commands:
                Note that on the NOTEPAD-12FX 4-channel audio capture device,
                capture device channels 1+2 are always fed from mixer CH 1+2.
 
+    ducker-off
+               Turn the ducker off.
+
+    ducker-on <INPUTS> <RELEASE>ms
+               Turn the ducker on and set the following values:
+                 INPUTS (range 0..15) is a bitmask for the input "selection"
+                         0 = no inputs watched, 15 = all four inputs watched
+                 RELEASE (range 0..5000) is a the "release" time in ms
+                         0 = release time 0, 5000 = release time 5000ms=5s
+
+    ducker-range <HEX_VALUE>|<RANGE>dB
+               Set the "duck range" to the given value.
+               Valid range is 0dB to 90dB, or 0 to 0x1fffffff.
+               It may be best to only use this while ducker is on.
+
+    ducker-threshold <HEX_VALUE>|<THRESH>dB
+               Set the "threshold" to the given value.
+               Valid range is -60dB to 0dB, or 0x000000 to 0x7fffff.
+               It may be best to only use this while ducker is on.
+
 Example:
 
     [user@host ~]$ scnp-cli audio-routing 2
