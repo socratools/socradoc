@@ -12,10 +12,10 @@ of mixer to connect to the USB audio capture device:
 
 If you want a nice GUI for that, go over to
 [soundcraft-utils](https://github.com/lack/soundcraft-utils) for a
-nice GUI which even synchronizes between multiple
-instances. [soundcraft-utils](https://github.com/lack/soundcraft-utils)
-is written in Python and uses a D-Bus service to provide a better user
-experience across tool invocations.
+nice GUI which even synchronizes between multiple instances of its GUI
+and CLI. [soundcraft-utils](https://github.com/lack/soundcraft-utils)
+is written in Python, uses a D-Bus service to provide a better user
+experience across tool invocations, and uses Gtk3 for the GUI.
 
 `scnp-cli` could be helpful if you do not want to install the whole
 Python software stack just to change the mixer's audio routing to the
