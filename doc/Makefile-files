@@ -1,0 +1,4 @@
+# -*- makefile -*-
+
+EXTRA_DIST += %reldir%/soundcraft-notepad-usb-protocol.md
+doc_DATA   += %reldir%/soundcraft-notepad-usb-protocol.md

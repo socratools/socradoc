@@ -16,6 +16,7 @@ XFAIL_TESTS =
 include build-helpers/package-version.mk
 
 include Makefile-files
+include doc/Makefile-files
 include include/Makefile-files
 include m4/Makefile-files
 include man/Makefile-files
