@@ -15,7 +15,7 @@ CONTROL message with EP etc.. FIXME
 
     00 00 04 00 00 00 00 00
                 ┗┩
-                 └───────────── source index (range 0..3)
+                 └─────────── source index (range 0..3)
 
 Table for Notepad-12FX sources
 
@@ -29,18 +29,44 @@ Table for Notepad-12FX sources
 Ducker
 ======
 
-CONTROL message with endpoint etc like the "Audio Routing" message.
+As the MacOS GUI only sends allows changing the settings of the ducker
+while the ducker is actually enabled, it might be prudent to do the
+same.
+
+CONTROL OUT message with endpoint 0 setting the "release" time,
+enabling/disabling ducking and setting the input set to use for
+ducking, all at the same time:
 
     00 00 02 80 01 01 0c 15
-                ┗┩ ┗┩
-                 │  └────────── bits[3..0] are INPUT[4..1] enable bitfield
-                 └───────────── 0x01 = enable ducking, 0x00 disable ducking
+                ┗┩ ┗┩ ┗━━━┩
+                 │  │     └── network endian release value in ms
+                 │  │         (observed range is 0..5000)
+                 │  └──────── bits[3..0] are INPUT[4..1] enable bitfield
+                 └─────────── 0x01 = enable ducking, 0x00 disable ducking
 
-TODO: How to set the values for these:
+CONTROL OUT message with endpoint 0 setting the "Duck range":
 
-  * Threshold (-60dB .. 0dB)
-  * Duck range (0dB .. 90dB)
-  * Release (0ms .. 5s)
+    00 00 02 81 1f ff ff ff
+
+    00 00 02 81 00 00 4a 67
+                ┗━━━━━━━━━┩
+                          └── network endian "duck range" value
+                              observed range is 0x1fff_ffff to 0x0000_4a67
+                              corresponding to displayed values of 0dB to 90dB
+
+TODO: How exactly is the mapping from the 0dB .. 90dB range to the
+      0x1fff_ffff .. 0x0000_4a67 (or perhaps even 0x0000_0000?) range?
+
+CONTROL OUT message with endpoint 0 setting the "threshold":
+
+    00 00 02 82 00 7f ff ff
+                ┗━━━━━━━━━┩
+                          └── network endian threshold value
+                              observed range is 0x20c3=8387 to 0x7fffff=8388607
+                              corresponding to displayed values of -60dB to 0dB
+
+TODO: How exactly is the mapping from the -60dB .. 0dB range to the
+      0x0020c3 (or perhaps even 0x000000?) .. 0x7fffff range?
 
 TODO: How to observe the meter value?
 
