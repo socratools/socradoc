@@ -1,0 +1,109 @@
+.\" The scnp-cli(1) man page     -*- nroff -*-
+.\"
+.\" This man page has been rewritten adhering to the following
+.\" documentation: man(7), man-pages(7), tbl(1)
+.\"
+.TH SCNP\-CLI 1 "2021\-05\-24" "Linux" "User commands"
+.\"
+.\" ====================================================================
+.\"
+.SH NAME
+scnp \- Soundcraft Notepad series mixer CLI
+.\"
+.\" ====================================================================
+.\"
+.SH SYNOPSIS
+.B scnp\-cli
+.B \-\-help
+.br
+.B scnp\-cli
+.B \-\-version
+.br
+.B scnp\-cli
+.B set
+.I N
+.\"
+.\" ====================================================================
+.\"
+.SH DESCRIPTION
+.PP
+\fBscnp\-cli\fR selects the mixer channels to connect the to USB audio capture device of a Soundcraft Notepad series mixer.
+.\"
+.\" ====================================================================
+.\"
+.SH OPTIONS
+.TP
+.B \-\-help
+Print usage message and exit.
+.TP
+.B \-\-version
+Print version message and exit.
+.TP
+.BI set\  N
+Find a supported device, and set its audio sources. There must be exactly one supported device connected. The valid source numbers \fIN\fR are specific to the device:
+.RS
+.TP
+.BR NOTEPAD\-5\  "channels 1+2 of 2-channel audio capture device"
+    \fI0\fR  CH 1+2
+    \fI1\fR  ST 2+3
+    \fI2\fR  ST 4+5
+    \fI3\fR  MASTER L+R
+.TP
+.BR NOTEPAD\-8FX\  "channels 1+2 of 2-channel audio capture device"
+    \fI0\fR  CH 1+2
+    \fI1\fR  ST 3+4
+    \fI2\fR  ST 5+6
+    \fI3\fR  MASTER L+R
+.TP
+.BR NOTEPAD\-12FX\  "channels 3+4 of 4-channel audio capture device"
+    \fI0\fR  CH 3+4
+    \fI1\fR  ST 5+6
+    \fI2\fR  ST 7+8
+    \fI3\fR  MASTER L+R
+.PP
+Note that on the \fBNOTEPAD-12FX\fR 4-channel audio capture device, capture device channels 1+2 are always fed from mixer CH 1+2.
+.\"
+.\" ====================================================================
+.\"
+.SH EXIT STATUS
+.PP
+When successful, \fBscnp\-cli\fR returns with exit code 0.
+.PP
+Any non\-0 exit code means that \fBscnp\-cli\fR has encountered an error and has bailed out.
+.\"
+.\" ====================================================================
+.\"
+.SH NOTES
+.SS "Devices and Permissions"
+.PP
+To communicate with an actual mixer device, \fBscnp\-cli\fR needs read/write access to the corresponding device special file.  The device file is usually named something like \fI/dev/bus/usb/007/008\fR (the numbers will vary) and its permissions are set up by
+.BR "udev(7)" .
+.PP
+See also \fB@docdir@/README.md\fR for more information.
+.\"
+.\" ====================================================================
+.\"
+.SH BUGS
+Report bugs to
+.UR https://github.com/spkr\-beep/beep/issues
+.UE .
+.\"
+.\" ====================================================================
+.\"
+.SH EXAMPLES
+.PP
+    [user@host ~]$ scnp-cli set \fI2\fR
+    Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX
+    Setting USB audio source to 2 (ST 7+8) for device NOTEPAD-12FX
+    [user@host ~]$ 
+.\"
+.\" ====================================================================
+.\"
+.SH SEE ALSO
+.\" Distro packages might want to replace the next line with their README
+.\" .BR @pkgdocdir@/README.Distro ,
+.BR @docdir@/README.md ,
+.UR "https://github.com/ndim/scnp\-cli"
+.UE ,
+.UR "https://github.com/lack/soundcraft\-utils"
+.UE

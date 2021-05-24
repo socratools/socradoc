@@ -1,0 +1,5 @@
+# -*- makefile -*-
+
+EXTRA_DIST += %reldir%/scnp-cli.1in
+CLEANFILES += %reldir%/scnp-cli.1
+man1_MANS  += %reldir%/scnp-cli.1
