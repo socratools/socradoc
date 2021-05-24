@@ -1,4 +1,7 @@
 # -*- makefile -*-
 
+EXTRA_DIST += LICENSE
+doc_DATA   += LICENSE
+
 EXTRA_DIST += README.md
 doc_DATA   += README.md
