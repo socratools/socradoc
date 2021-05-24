@@ -52,21 +52,21 @@ Commands:
                The valid source numbers are specific to the device:
 
                NOTEPAD-5 channels 1+2 of 2-channel audio capture device
-                 0  CH 1+2
-                 1  ST 2+3
-                 2  ST 4+5
+                 0  MIC+LINE 1+2
+                 1  LINE 2+3
+                 2  LINE 4+5
                  3  MASTER L+R
 
                NOTEPAD-8FX channels 1+2 of 2-channel audio capture device
-                 0  CH 1+2
-                 1  ST 3+4
-                 2  ST 5+6
+                 0  MIC 1+2
+                 1  LINE 3+4
+                 2  LINE 5+6
                  3  MASTER L+R
 
                NOTEPAD-12FX channels 3+4 of 4-channel audio capture device
-                 0  CH 3+4
-                 1  ST 5+6
-                 2  ST 7+8
+                 0  MIC 3+4
+                 1  LINE 5+6
+                 2  LINE 7+8
                  3  MASTER L+R
 
                Note that on the NOTEPAD-12FX 4-channel audio capture device,
@@ -76,7 +76,7 @@ Example:
 
     [user@host ~]$ scnp-cli audio-routing 2
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX
-    Setting USB audio source to 2 (ST 7+8) for device NOTEPAD-12FX
+    Setting USB audio source to 2 (LINE 7+8) for device NOTEPAD-12FX
     [user@host ~]$ 
 ```
 

@@ -91,17 +91,17 @@ const notepad_device_T handled_devices[] = {
     { 0x0030,
       "NOTEPAD-5",
       "channels 1+2 of 2-channel audio capture device",
-      {"CH 1+2", "ST 2+3", "ST 4+5", "MASTER L+R"}},
+      {"MIC+LINE 1+2", "LINE 2+3", "LINE 4+5", "MASTER L+R"}},
 
     { 0x0031,
       "NOTEPAD-8FX",
       "channels 1+2 of 2-channel audio capture device",
-      {"CH 1+2", "ST 3+4", "ST 5+6", "MASTER L+R"}},
+      {"MIC 1+2", "LINE 3+4", "LINE 5+6", "MASTER L+R"}},
 
     { 0x0032,
       "NOTEPAD-12FX",
       "channels 3+4 of 4-channel audio capture device",
-      {"CH 3+4", "ST 5+6", "ST 7+8", "MASTER L+R"}},
+      {"MIC 3+4", "LINE 5+6", "LINE 7+8", "MASTER L+R"}},
 
     /* The termination marker is .idProduct being 0 */
     { 0 }
@@ -382,7 +382,7 @@ void print_usage(const char *const prog)
            "\n"
            "    [user@host ~]$ scnp-cli audio-routing 2\n"
            "    Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX\n"
-           "    Setting USB audio source to 2 (ST 7+8) for device NOTEPAD-12FX\n"
+           "    Setting USB audio source to 2 (LINE 7+8) for device NOTEPAD-12FX\n"
            "    [user@host ~]$ \n");
 }
 
