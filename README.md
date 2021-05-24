@@ -86,9 +86,9 @@ Build Requirements
 For building `scnp-cli`, you need at least
 
   * clang or gcc
-  * make
-  * libusb-1.0 (might be in the libusbx OS package)
-  * pkg-config or pkgconf
+  * make (GNU make is helpful)
+  * `libusb-1.0.pc` (from OS package like `libusbx-devel` or `libusb-1.0-0-dev`)
+  * pkg-config command (from pkg-config or pkgconf package)
 
 For building from a git source tree, you also need at least
 
