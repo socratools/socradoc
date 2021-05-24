@@ -35,7 +35,7 @@ Usage
 This is the output of `scnp-cli --help`:
 
 ```
-Usage: scnp-cli <command>
+Usage: scnp-cli <command> <command_params...>
 
 Select mixer channels to connect the to USB audio capture device
 of a Soundcraft Notepad series mixer.
