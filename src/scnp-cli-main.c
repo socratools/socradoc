@@ -74,12 +74,15 @@
     } while (0)
 
 
+#define SOURCES_MAX 4
+
+
 /* We do not care about padding and storage efficiency here */
 typedef struct {
     uint16_t idProduct;
     const char *const name;
     const char *const source_descr;
-    const char *const sources[4];
+    const char *const sources[SOURCES_MAX];
 } notepad_device_T;
 
 
@@ -203,12 +206,13 @@ const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct)
 
 
 static
-void device_set(libusb_device *dev, const uint8_t v);
+void device_set(libusb_device *dev, const uint8_t src_idx)
+    __attribute__(( nonnull(1) ));
 
 static
-void device_set(libusb_device *dev, const uint8_t v)
+void device_set(libusb_device *dev, const uint8_t src_idx)
 {
-    // printf("device_set(%p, %u)\n", (void *)dev, v);
+    // printf("device_set(%p, %u)\n", (void *)dev, src_idx);
 
     struct libusb_device_descriptor desc;
     const int luret_get_dev_descr =
@@ -225,14 +229,14 @@ void device_set(libusb_device *dev, const uint8_t v)
     COND_OR_FAIL(notepad_device != NULL, "unhandled idProduct");
 
     printf("Setting USB audio source to %d (%s) for device %s\n",
-	   v, notepad_device->sources[v], notepad_device->name);
+	   src_idx, notepad_device->sources[src_idx], notepad_device->name);
 
     uint8_t data[8];
     data[0] = 0x00;
     data[1] = 0x00;
     data[2] = 0x04;
     data[3] = 0x00;
-    data[4] = v;
+    data[4] = src_idx;
     data[5] = 0x00;
     data[6] = 0x00;
     data[7] = 0x00;
@@ -347,7 +351,7 @@ void print_usage(const char *const prog)
     for (int i=0; handled_devices[i].idProduct != 0; ++i) {
         printf("               %s %s\n",
                handled_devices[i].name, handled_devices[i].source_descr);
-        for (int k=0; k<4; k++) {
+        for (int k=0; k<SOURCES_MAX; k++) {
             printf("                 %d  %s\n",
                    k, handled_devices[i].sources[k]);
         }
@@ -434,13 +438,13 @@ int parse_cmdline(const int argc, const char *const argv[])
             fprintf(stderr, "Fatal: Error converting number: too large\n");
             return EXIT_FAILURE;
         }
-        if (lval > 3) {
-            fprintf(stderr, "Fatal: Error converting number: value range\n");
-            return EXIT_FAILURE;
-        }
+
         // printf("SET lval=%ld\n", lval);
-        const uint8_t u8val = (uint8_t) lval;
-        command_set(u8val);
+        const uint8_t source_index = (uint8_t) lval;
+        COND_OR_RETURN(source_index < SOURCES_MAX,
+                       "sources index must be less than 4");
+
+        command_set(source_index);
         return EXIT_SUCCESS;
     } else {
         fprintf(stderr, "Fatal: Unhandled command line argument(s)\n");
