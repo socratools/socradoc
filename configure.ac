@@ -3,7 +3,7 @@
 ########################################################################
 
 AC_PREREQ([2.69])
-AC_INIT([CLI for Soundcraft Notepad series mixers],
+AC_INIT([Soundcraft Notepad series mixer CLI],
         [m4_esyscmd([./build-helpers/package-version . version-stamp])],
         [https://github.com/ndim/scnp-cli/issues],
         [scnp-cli],
@@ -80,7 +80,7 @@ AC_OUTPUT
 cat<<EOF
 
 Configuration:
-  Package: $PACKAGE_TARNAME
+  Package: $PACKAGE_TARNAME ($PACKAGE_NAME)
   Version: $PACKAGE_VERSION
 
   srcdir: $srcdir
