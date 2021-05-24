@@ -22,20 +22,25 @@ CLEANFILES  += %reldir%/scnp-cli_unknown.sh
 TESTS       += %reldir%/scnp-cli_unknown.sh
 XFAIL_TESTS += %reldir%/scnp-cli_unknown.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_set_-1.shin
-CLEANFILES  += %reldir%/scnp-cli_set_-1.sh
-TESTS       += %reldir%/scnp-cli_set_-1.sh
-XFAIL_TESTS += %reldir%/scnp-cli_set_-1.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_-1.shin
+CLEANFILES  += %reldir%/scnp-cli_audio-routing_-1.sh
+TESTS       += %reldir%/scnp-cli_audio-routing_-1.sh
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_-1.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_set_4.shin
-CLEANFILES  += %reldir%/scnp-cli_set_4.sh
-TESTS       += %reldir%/scnp-cli_set_4.sh
-XFAIL_TESTS += %reldir%/scnp-cli_set_4.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_4.shin
+CLEANFILES  += %reldir%/scnp-cli_audio-routing_4.sh
+TESTS       += %reldir%/scnp-cli_audio-routing_4.sh
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_4.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_set_nothing.shin
-CLEANFILES  += %reldir%/scnp-cli_set_nothing.sh
-TESTS       += %reldir%/scnp-cli_set_nothing.sh
-XFAIL_TESTS += %reldir%/scnp-cli_set_nothing.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_emptystr.shin
+CLEANFILES  += %reldir%/scnp-cli_audio-routing_emptystr.sh
+TESTS       += %reldir%/scnp-cli_audio-routing_emptystr.sh
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_emptystr.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.shin
+CLEANFILES  += %reldir%/scnp-cli_audio-routing_nothing.sh
+TESTS       += %reldir%/scnp-cli_audio-routing_nothing.sh
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.sh
 
 # We have only this one test case which actually touches a physical
 # device, so that we do not run into difficulties when multiple tests
@@ -45,10 +50,10 @@ XFAIL_TESTS += %reldir%/scnp-cli_set_nothing.sh
 # default value of 3 - in the hope that this is the value the hardware
 # already had been set to.
 
-EXTRA_DIST  += %reldir%/scnp-cli_set_3.shin
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.shin
 if HAVE_LSUSB
 if HAVE_WC
-CLEANFILES  += %reldir%/scnp-cli_set_3.sh
-TESTS       += %reldir%/scnp-cli_set_3.sh
+CLEANFILES  += %reldir%/scnp-cli_audio-routing_3.sh
+TESTS       += %reldir%/scnp-cli_audio-routing_3.sh
 endif
 endif

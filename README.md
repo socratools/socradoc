@@ -46,7 +46,8 @@ Commands:
 
     --version  Print version message and exit.
 
-    set <NUM>  Find a supported device, and set its audio sources.
+    audio-routing <NUM>
+               Find a supported device, and set its audio sources.
                There must be exactly one supported device connected.
                The valid source numbers are specific to the device:
 
@@ -73,7 +74,7 @@ Commands:
 
 Example:
 
-    [user@host ~]$ scnp-cli set 2
+    [user@host ~]$ scnp-cli audio-routing 2
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX
     Setting USB audio source to 2 (ST 7+8) for device NOTEPAD-12FX
     [user@host ~]$ 

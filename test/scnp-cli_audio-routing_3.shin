@@ -7,7 +7,7 @@ then
     exit 77
 elif test "x$device_count" = "x1"
 then
-    @abs_top_builddir@/scnp-cli set 3
+    @abs_top_builddir@/scnp-cli audio-routing 3
 else
     echo "Too many devices found."
     exit 77

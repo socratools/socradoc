@@ -20,7 +20,7 @@ scnp \- Soundcraft Notepad series mixer CLI
 .B \-\-version
 .br
 .B scnp\-cli
-.B set
+.B audio\-routing
 .I N
 .\"
 .\" ====================================================================
@@ -39,7 +39,7 @@ Print usage message and exit.
 .B \-\-version
 Print version message and exit.
 .TP
-.BI set\  N
+.BI audio\-routing\  N
 Find a supported device, and set its audio sources. There must be exactly one supported device connected. The valid source numbers \fIN\fR are specific to the device:
 .RS
 .TP
@@ -92,7 +92,7 @@ Report bugs to
 .\"
 .SH EXAMPLES
 .PP
-    [user@host ~]$ scnp-cli set \fI2\fR
+    [user@host ~]$ scnp-cli audio\-routing \fI2\fR
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX
     Setting USB audio source to 2 (ST 7+8) for device NOTEPAD-12FX
     [user@host ~]$ 

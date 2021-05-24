@@ -206,23 +206,52 @@ const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct)
 
 
 static
-void device_set(libusb_device *dev, const uint8_t src_idx)
-    __attribute__(( nonnull(1) ));
+void device_send_ctrl_message(libusb_device *dev,
+                              uint8_t *data, const size_t data_size)
+    __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_set(libusb_device *dev, const uint8_t src_idx)
+void device_send_ctrl_message(libusb_device *dev,
+                              uint8_t *data, const size_t data_size)
 {
-    // printf("device_set(%p, %u)\n", (void *)dev, src_idx);
+    COND_OR_FAIL(data_size < UINT16_MAX, "data_size exceeds uint16_t range");
+    COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
+    const uint16_t u16_data_size = (uint16_t) data_size;
 
-    struct libusb_device_descriptor desc;
-    const int luret_get_dev_descr =
-        libusb_get_device_descriptor(dev, &desc);
-    LIBUSB_OR_FAIL(luret_get_dev_descr, "libusb_get_device_descriptor");
+    // printf("device_send_ctrl_message(%p, %p)\n", (void *)dev, (void *)data);
 
     libusb_device_handle *dev_handle;
     const int luret_open =
         libusb_open(dev, &dev_handle);
     LIBUSB_OR_FAIL(luret_open, "libusb_open");
+
+    const int luret_ctrl_transfer =
+        libusb_control_transfer(dev_handle,
+                                0x40 /* bmRequestType */,
+                                16 /* bReqest */,
+                                0 /* wValue */,
+                                0 /* wIndex */,
+                                data, u16_data_size,
+                                10000 /* timeout in ms */);
+    LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
+    COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
+                 "libusb_control_transfer");
+
+    libusb_close(dev_handle);
+}
+
+
+static
+void device_audio_routing(libusb_device *dev, const uint8_t src_idx)
+    __attribute__(( nonnull(1) ));
+
+static
+void device_audio_routing(libusb_device *dev, const uint8_t src_idx)
+{
+    struct libusb_device_descriptor desc;
+    const int luret_get_dev_descr =
+        libusb_get_device_descriptor(dev, &desc);
+    LIBUSB_OR_FAIL(luret_get_dev_descr, "libusb_get_device_descriptor");
 
     const notepad_device_T *const notepad_device =
         notepad_device_from_idProduct(desc.idProduct);
@@ -241,29 +270,17 @@ void device_set(libusb_device *dev, const uint8_t src_idx)
     data[6] = 0x00;
     data[7] = 0x00;
 
-    const int luret_ctrl_transfer =
-        libusb_control_transfer(dev_handle,
-                                0x40 /* bmRequestType */,
-                                16 /* bReqest */,
-                                0 /* wValue */,
-                                0 /* wIndex */,
-                                data, sizeof(data),
-                                10000 /* timeout in ms */);
-    LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
-    COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
-                 "libusb_control_transfer");
-
-    libusb_close(dev_handle);
+    device_send_ctrl_message(dev, data, sizeof(data));
 }
 
 
 static
-void command_set(const uint8_t v);
+void command_audio_routing(const uint8_t source_index);
 
 static
-void command_set(const uint8_t v)
+void command_audio_routing(const uint8_t source_index)
 {
-    // printf("command_set(%u)\n", v);
+    // printf("command_audio_routing(%u)\n", source_index);
 
     const int luret_init =
         libusb_init(NULL);
@@ -282,7 +299,7 @@ void command_set(const uint8_t v)
         exit(EXIT_FAILURE);
     }
 
-    device_set(dev_list[0], v);
+    device_audio_routing(dev_list[0], source_index);
 
     for (size_t i=0; i<dev_count; ++i) {
         libusb_unref_device(dev_list[i]);
@@ -343,7 +360,8 @@ void print_usage(const char *const prog)
            "\n"
            "    --version  Print version message and exit.\n"
            "\n"
-           "    set <NUM>  Find a supported device, and set its audio sources.\n"
+           "    audio-routing <NUM>\n"
+           "               Find a supported device, and set its audio sources.\n"
            "               There must be exactly one supported device connected.\n"
            "               The valid source numbers are specific to the device:\n"
            "\n",
@@ -362,7 +380,7 @@ void print_usage(const char *const prog)
            "\n"
            "Example:\n"
            "\n"
-           "    [user@host ~]$ scnp-cli set 2\n"
+           "    [user@host ~]$ scnp-cli audio-routing 2\n"
            "    Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX\n"
            "    Setting USB audio source to 2 (ST 7+8) for device NOTEPAD-12FX\n"
            "    [user@host ~]$ \n");
@@ -418,9 +436,13 @@ int parse_cmdline(const int argc, const char *const argv[])
     } else if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
         print_version(prog);
         return EXIT_SUCCESS;
-    } else if ((argc == 3) && (strcmp(argv[1], "set") == 0)) {
+    } else if ((argc == 3) && (strcmp(argv[1], "audio-routing") == 0)) {
         char *p = NULL;
         errno = 0;
+        if (*(argv[2]) == '\0') {
+            fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+            return EXIT_FAILURE;
+        }
         const long lval = strtol(argv[2], &p, 10);
         if ((p == NULL) || (*p != '\0')) {
             fprintf(stderr, "Fatal: Error converting number\n");
@@ -439,12 +461,12 @@ int parse_cmdline(const int argc, const char *const argv[])
             return EXIT_FAILURE;
         }
 
-        // printf("SET lval=%ld\n", lval);
+        // printf("audio-routing lval=%ld\n", lval);
         const uint8_t source_index = (uint8_t) lval;
         COND_OR_RETURN(source_index < SOURCES_MAX,
                        "sources index must be less than 4");
 
-        command_set(source_index);
+        command_audio_routing(source_index);
         return EXIT_SUCCESS;
     } else {
         fprintf(stderr, "Fatal: Unhandled command line argument(s)\n");

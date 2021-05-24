@@ -1,0 +1,3 @@
+#!/bin/sh
+
+@abs_top_builddir@/scnp-cli audio-routing -1
