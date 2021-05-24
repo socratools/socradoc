@@ -43,10 +43,6 @@ NDIM_PATH_PROG([git])
 
 ########################################################################
 
-AC_LANG_WERROR
-
-########################################################################
-
 # Checks for libraries.
 m4_pattern_forbid([^PKG_CHECK_MODULES])dnl
 PKG_CHECK_MODULES([LIBUSB10], [libusb-1.0])
@@ -61,13 +57,32 @@ PKG_CHECK_MODULES([LIBUSB10], [libusb-1.0])
 
 ########################################################################
 
-# TODO: These should be checked to work before using them.
-AM_CFLAGS="$AM_CFLAGS -Wall"
-AM_CFLAGS="$AM_CFLAGS -Wextra"
-AM_CFLAGS="$AM_CFLAGS -Werror"
-AM_CFLAGS="$AM_CFLAGS -std=c11"
-AM_CFLAGS="$AM_CFLAGS -pedantic"
-AC_SUBST([AM_CFLAGS])
+m4_pattern_forbid([^NDIM_CFLAGS_ADD])
+
+NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Werror])
+NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Wall])
+NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Wextra])
+NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-Weverything -Wno-unused-macros -Wno-padded])
+NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-std=c11])
+NDIM_CFLAGS_ADD([PEDANTIC_C11_CFLAGS], [-pedantic])
+
+dnl As we cannot remove the #define lines from the conftest.c
+dnl AC_LANG_SOURCE generates, and as we cannot know and thus use all
+dnl the #define lines which Autoconf generates, we need to add
+dnl -Wno-unused-macros for the automatic checks to work.
+dnl
+dnl However, for the eventual use of the PEDANTIC_C11_CFLAGS, we can
+dnl make use of the warnings for unused macros, so let's filter out
+dnl the -Wno-unused-macros flag from PEDANTIC_C11_CFLAGS.
+
+ndim_new=""
+for ndim_tmp in ${PEDANTIC_C11_CFLAGS}
+do
+  AS_VAR_IF([ndim_tmp], [-Wno-unused-macros], [], [dnl
+    AS_VAR_APPEND([ndim_new], [" $ndim_tmp"])
+  ])
+done
+PEDANTIC_C11_CFLAGS="$ndim_new"
 
 ########################################################################
 

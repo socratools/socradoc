@@ -74,18 +74,7 @@
     } while (0)
 
 
-#define LIBUSB_OR_RETURN(LIBUSB_RETVAL, MSG)                          \
-    do {                                                              \
-        const int retval = (LIBUSB_RETVAL);                           \
-        const char *const msg = (MSG);                                \
-        if (retval < 0) {                                             \
-            fprintf(stderr, "Fatal: %s: %s\n", msg,                   \
-                    libusb_strerror(retval));                         \
-            return EXIT_FAILURE;                                      \
-        }                                                             \
-    } while (0)
-
-
+/* We do not care about padding and storage efficiency here */
 typedef struct {
     uint16_t idProduct;
     const char *const name;
@@ -94,6 +83,7 @@ typedef struct {
 } notepad_device_T;
 
 
+static
 const notepad_device_T handled_devices[] = {
     { 0x0030,
       "NOTEPAD-5",
@@ -132,9 +122,14 @@ void get_matching_devices(libusb_device ***device_list, size_t *device_count)
     size_t ret_count = 0;
 
     libusb_device **devices = NULL;
-    const int luret_get_device_list =
+    const ssize_t luret_get_device_list =
         libusb_get_device_list(NULL, &devices);
-    LIBUSB_OR_FAIL(luret_get_device_list, "libusb_get_device_list");
+    if (luret_get_device_list < 0) {
+        COND_OR_FAIL(luret_get_device_list >= INT_MIN,
+                     "ssize_t value out of int range");
+        const int luret_get_device_list_as_int = (int) luret_get_device_list;
+        LIBUSB_OR_FAIL(luret_get_device_list_as_int, "libusb_get_device_list");
+    }
 
     for (int i=0; devices[i] != NULL; ++i) {
         libusb_device *dev = devices[i];
@@ -359,12 +354,12 @@ const char *arg0_to_prog(const char *const arg0)
     const char *const prog =
         (*after_last_slash == '\0')?arg0:after_last_slash;
 
-    if (false) {
-        fprintf(stderr, "argv[0] %s\n", arg0);
-        fprintf(stderr, "last_slash %s\n", last_slash);
-        fprintf(stderr, "after_last_slash %s\n", after_last_slash);
-        fprintf(stderr, "prog %s\n", prog);
-    }
+#if 0
+    fprintf(stderr, "argv[0] %s\n", arg0);
+    fprintf(stderr, "last_slash %s\n", last_slash);
+    fprintf(stderr, "after_last_slash %s\n", after_last_slash);
+    fprintf(stderr, "prog %s\n", prog);
+#endif
 
     return prog;
 }
@@ -422,7 +417,7 @@ int parse_cmdline(const int argc, const char *const argv[])
             return EXIT_FAILURE;
         }
         // printf("SET lval=%ld\n", lval);
-        const uint8_t u8val = lval;
+        const uint8_t u8val = (uint8_t) lval;
         command_set(u8val);
         return EXIT_SUCCESS;
     } else {

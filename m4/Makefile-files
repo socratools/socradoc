@@ -1,3 +1,4 @@
 # -*- makefile -*-
 
+EXTRA_DIST += %reldir%/ndim-cflags-add.m4
 EXTRA_DIST += %reldir%/ndim-path-prog.m4
