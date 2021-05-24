@@ -18,7 +18,7 @@ EXTRA_DIST     += $(udevrules_files)
 install-udev-rules:
 	$(INSTALL)    -m 0755 -d "$(DESTDIR)$(udevrulesdir)"
 	@set -ex; for file in $(udevrules_files); do \
-	  if test -f "$$file"; then srcdir""; else srcdir="$(srcdir)"; fi; \
+	  if test -f "$$file"; then srcdir=""; else srcdir="$(srcdir)"; fi; \
           $(INSTALL) -C -m 0644 -t "$(DESTDIR)$(udevrulesdir)" "$$srcdir/$$file"; \
 	done
 
