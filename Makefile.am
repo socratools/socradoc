@@ -2,10 +2,14 @@ ACLOCAL_AMFLAGS = -I auto-m4 -I m4 --install
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
 
 bin_PROGRAMS =
+check_PROGRAMS =
+check_SCRIPTS =
 BUILT_SOURCES =
 CLEANFILES =
 EXTRA_DIST =
 noinst_DATA =
+TESTS =
+XFAIL_TESTS =
 
 include build-helpers/package-version.mk
 
@@ -13,3 +17,16 @@ include Makefile-files
 include include/Makefile-files
 include m4/Makefile-files
 include src/Makefile-files
+include test/Makefile-files
+
+sed_commands =
+sed_commands += -e 's|[@]abs_top_builddir@|$(abs_top_builddir)|g'
+sed_commands += -e 's|[@]abs_top_srcdir@|$(abs_top_srcdir)|g'
+sed_commands += -e 's|[@]LSUSB@|$(LSUSB)|g'
+sed_commands += -e 's|[@]WC@|$(WC)|g'
+
+.shin.sh:
+	@$(MKDIR_P) $(@D)
+	$(SED) $(sed_commands) $< > $@.new
+	mv -f $@.new $@
+	chmod +x $@

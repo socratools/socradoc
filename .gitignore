@@ -8,6 +8,7 @@
 /auto-aux/depcomp
 /auto-aux/install-sh
 /auto-aux/missing
+/auto-aux/test-driver
 /auto-m4/*.m4
 /configure
 /include/auto-config.h.in

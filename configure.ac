@@ -42,6 +42,8 @@ AC_PROG_INSTALL
 
 m4_pattern_forbid([^NDIM_PATH_PROG])dnl
 NDIM_PATH_PROG([git])
+NDIM_PATH_PROG([lsusb])
+NDIM_PATH_PROG([wc])
 
 
 ########################################################################

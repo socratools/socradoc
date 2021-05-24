@@ -116,3 +116,7 @@ or for an out of source tree build
     ../configure
     make
     make install
+
+Note that if you run `make check` or `make distcheck` and there is
+actually a Notepad series mixer connected, one of the test cases will
+write to the device and possibly change its settings.

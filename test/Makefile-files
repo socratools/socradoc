@@ -1,0 +1,54 @@
+# -*- makefile -*-
+
+# This might not work when cross-compiling.
+
+check_PROGRAMS += scnp-cli
+
+EXTRA_DIST  += %reldir%/scnp-cli--help.shin
+CLEANFILES  += %reldir%/scnp-cli--help.sh
+TESTS       += %reldir%/scnp-cli--help.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli--version.shin
+CLEANFILES  += %reldir%/scnp-cli--version.sh
+TESTS       += %reldir%/scnp-cli--version.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_no-arguments.shin
+CLEANFILES  += %reldir%/scnp-cli_no-arguments.sh
+TESTS       += %reldir%/scnp-cli_no-arguments.sh
+XFAIL_TESTS += %reldir%/scnp-cli_no-arguments.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_unknown.shin
+CLEANFILES  += %reldir%/scnp-cli_unknown.sh
+TESTS       += %reldir%/scnp-cli_unknown.sh
+XFAIL_TESTS += %reldir%/scnp-cli_unknown.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_set_-1.shin
+CLEANFILES  += %reldir%/scnp-cli_set_-1.sh
+TESTS       += %reldir%/scnp-cli_set_-1.sh
+XFAIL_TESTS += %reldir%/scnp-cli_set_-1.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_set_4.shin
+CLEANFILES  += %reldir%/scnp-cli_set_4.sh
+TESTS       += %reldir%/scnp-cli_set_4.sh
+XFAIL_TESTS += %reldir%/scnp-cli_set_4.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_set_nothing.shin
+CLEANFILES  += %reldir%/scnp-cli_set_nothing.sh
+TESTS       += %reldir%/scnp-cli_set_nothing.sh
+XFAIL_TESTS += %reldir%/scnp-cli_set_nothing.sh
+
+# We have only this one test case which actually touches a physical
+# device, so that we do not run into difficulties when multiple tests
+# are run in parallel.
+#
+# As this test actually sets the hardware state, this sets it to the
+# default value of 3 - in the hope that this is the value the hardware
+# already had been set to.
+
+EXTRA_DIST  += %reldir%/scnp-cli_set_3.shin
+if HAVE_LSUSB
+if HAVE_WC
+CLEANFILES  += %reldir%/scnp-cli_set_3.sh
+TESTS       += %reldir%/scnp-cli_set_3.sh
+endif
+endif
