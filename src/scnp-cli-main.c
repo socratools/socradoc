@@ -228,7 +228,7 @@ void device_send_ctrl_message(libusb_device *dev,
     const int luret_ctrl_transfer =
         libusb_control_transfer(dev_handle,
                                 0x40 /* bmRequestType */,
-                                16 /* bReqest */,
+                                16 /* bRequest */,
                                 0 /* wValue */,
                                 0 /* wIndex */,
                                 data, u16_data_size,
