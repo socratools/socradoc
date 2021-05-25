@@ -39,10 +39,12 @@ mixer has been set to.
 Audio Routing
 =============
 
-The "Audio Routing" tab allows us to select any of the four different
-selections for the audio input.
+The "Audio Routing" tab of the MacOS control panel allows us to select
+any one of four different options for the audio input.
 
-This is the format of the "set audio routing" command:
+
+audio-routing command
+---------------------
 
     00 00 04 00 00 00 00 00
                 ┗┩
@@ -80,30 +82,65 @@ Notepad-8FX. and Notepad-12FX.
 Ducker
 ======
 
-Note: The ducker information is still preliminary, and needs testing.
+The Notepad-12FX has a ducker feature which can duck USB playback
+channels 1+2 (on the Notepad-12FX four channel USB playback device)
+when it detects a signal on any combination of the four channels going
+to the USB audio capture device.
+
+TODO: What about the 8FX with its two MIC channels and two channel
+      Audio capture? What about the Notepad-5 with its single MIC
+      channel, two channel Audio interface and no FX engine?
+
+      Screenshots from the Windows/MacOS vendor software with one of
+      those devices connected might be helpful here, even without packet dumps.
+
+The ducker is not mentioned at all in the user manual for the Notepad
+series of mixers, but it can be turned on and off and its parameters
+tuned in the "Ducker" tab of Soundcraft's MacOS (and presumably
+Windows) software.
+
+Note: The ducker information is still preliminary, and needs testing,
+      especially on devices other than a Notepad-12FX, if those even
+      support that feature.
+
+The following command (play is from the sox "audio swiss army knife")
+can be helpful for testing the ducker:
+
+    play -n synth whitenoise
 
 As the MacOS GUI only sends USB requests changing the settings of the
 ducker while the ducker is actually enabled both in the GUI and on the
 mixer, it might be prudent to do the same in other software
 implementations.
 
-CONTROL OUT message with endpoint 0 setting the "release" time,
-enabling/disabling ducking and setting the input set to use for
-ducking, all at the same time:
+TODO: How to observe the meter value?
+
+
+ducker-off and ducker-on command
+--------------------------------
+
+CONTROL OUT message setting the "release" time, enabling/disabling the
+ducker and configuring the set of inputs for the ducker, all at the
+same time:
 
     00 00 02 80 01 01 0c 15
                 ┗┩ ┗┩ ┗━━━┩
                  │  │     └── network endian release value in ms
                  │  │         (observed range is 0..5000)
                  │  └──────── bits[3..0] are INPUT[4..1] enable bitfield
-                 └─────────── 0x01 = enable ducking, 0x00 disable ducking
+                 └─────────── 0x01 = enable ducker, 0x00 disable ducker
 
-TODO: What are those four inputs? Just the first four MIC channels? Or
-whatever the four Audio capture channels are? And what about the 8FX
-with its two MIC channels and two channel Audio capture? And what
-about the Notepad-5 with its single MIC channel? Screenshots from the
-Windows/MacOS vendor software with one of those devices connected
-might be helpful here, even without packet dumps.
+The four (in the case of the Notepad-12FX) inputs we can select from
+are the same four channels of the USB audio capture device.
+
+This means that the ducker behaviour of the mixer depends on the last
+"Audio Routing" command. And there is a curiously weird edge case
+here: When the Audio Routing is set to 3 (Mix L+R), the USB output
+channel 1+2 signal is mixed into MIX L+R, and thus ducks itself!
+
+
+ducker-range command
+--------------------
 
 CONTROL OUT message with endpoint 0 setting the "Duck range":
 
@@ -115,8 +152,12 @@ CONTROL OUT message with endpoint 0 setting the "Duck range":
                               observed range is 0x1fff_ffff to 0x0000_4a67
                               corresponding to displayed values of 0dB to 90dB
 
-TODO: How exactly is the mapping from the 0dB .. 90dB range to the
-      0x1fff_ffff .. 0x0000_4a67 (or perhaps even 0x0000_0000?) range?
+TODO: How exactly does the 0dB .. 90dB range map to the 0x1fff_ffff
+      .. 0x0000_4a67 (or perhaps even 0x0000_0000?) range and back?
+
+
+ducker-threshold command
+------------------------
 
 CONTROL OUT message with endpoint 0 setting the "threshold":
 
@@ -126,7 +167,5 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
                               observed range is 0x20c3=8387 to 0x7fffff=8388607
                               corresponding to displayed values of -60dB to 0dB
 
-TODO: How exactly is the mapping from the -60dB .. 0dB range to the
-      0x0020c3 (or perhaps even 0x000000?) .. 0x7fffff range?
-
-TODO: How to observe the meter value?
+TODO: How exactly does -60dB .. 0dB range map to the 0x0020c3 (or
+      perhaps even 0x000000?) .. 0x7fffff range and back?
