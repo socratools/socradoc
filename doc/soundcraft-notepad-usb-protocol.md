@@ -28,12 +28,28 @@ Mixer state vs host software state
 
 The MacOS "Soundcraft USB audio control panel" does not appear to
 query any information from the mixer when the Mac is up and running in
-normal operation. On starting the "Soundcraft USB audio control
-panel", no USB requests can be observed which query the mixer
-state. However, the "Soundcraft USB audio control panel" remembers the
-last state it set the mixer to when it is started the next time, which
-means that some software component must keep track of the state the
-mixer has been set to.
+normal operation.
+
+On starting the "Soundcraft USB audio control panel", no USB requests
+can be observed which query the mixer state. However, the "Soundcraft
+USB audio control panel" remembers the last state it set the mixer to
+when it is started the next time, which means that some software
+component must keep track of the state the mixer has been set to.
+
+When the mixer state is changed via USB commands, such as
+
+  * non-default audio routing, the default being Mix L+R
+  * enabled ducking
+  * enabled ducking with weird specific range and threshold values
+
+and the mixer is power cycled, the audio routing is back to the Mix
+L+R default, ducking is off, and if you then re-enable ducking, the
+range and threshold appear set to reasonable default values.  This
+suggests that the mixer has no nonvolatile storage for any state.
+
+The question is still open, though, about whether there might be a
+"query state" USB command for when a continuously powered mixer is
+plugged into and unplugged from a computer repeatedly.
 
 
 Audio Routing
