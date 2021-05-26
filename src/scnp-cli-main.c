@@ -750,13 +750,7 @@ void print_usage(const char *const prog)
            "\n"
            "    meter\n"
            "               Show the meter until you press Ctrl-C\n"
-           "\n"
-           "Example:\n"
-           "\n"
-           "    [user@host ~]$ scnp-cli audio-routing 2\n"
-           "    Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX\n"
-           "    Setting USB audio source to 2 (LINE 7+8) for device NOTEPAD-12FX\n"
-           "    [user@host ~]$ \n");
+           );
 }
 
 

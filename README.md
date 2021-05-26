@@ -94,13 +94,6 @@ Commands:
 
     meter
                Show the meter until you press Ctrl-C
-
-Example:
-
-    [user@host ~]$ scnp-cli audio-routing 2
-    Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad-12FX
-    Setting USB audio source to 2 (LINE 7+8) for device NOTEPAD-12FX
-    [user@host ~]$ 
 ```
 
 
