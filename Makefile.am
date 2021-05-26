@@ -34,11 +34,9 @@ sed_commands += -e 's|[@]WC@|$(WC)|g'
 
 .shin.sh:
 	@$(MKDIR_P) $(@D)
-	$(SED) $(sed_commands) $< > $@.new
-	mv -f $@.new $@
+	$(SED) $(sed_commands) $< > $@.$$$$.new && mv -f $@.$$$$.new $@
 	chmod +x $@
 
 .1in.1:
 	@$(MKDIR_P) $(@D)
-	$(SED) $(sed_commands) $< > $@.new
-	mv -f $@.new $@
+	$(SED) $(sed_commands) $< > $@.$$$$.new && mv -f $@.$$$$.new $@
