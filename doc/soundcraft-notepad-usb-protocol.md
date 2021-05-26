@@ -43,8 +43,8 @@ When the mixer state is changed via USB commands, such as
   * enabled ducking
   * enabled ducking with weird specific range and threshold values
 
-and the mixer is power cycled, the audio routing is back to the Mix
-L+R default, ducking is off, and if you then re-enable ducking, the
+and the mixer is power cycled, the audio routing is back to the "Mix
+L+R" default, ducking is off, and if you then re-enable ducking, the
 range and threshold appear set to reasonable default values.  This
 suggests that the mixer has no nonvolatile storage for any state.
 
@@ -91,8 +91,8 @@ Table for Notepad-12FX sources:
     2         LINE 7+8         Stereo input 7+8
     3         MASTER L+R       Mix L+R
 
-The audio routing command been tested to work with scnp-cli for the
-Notepad-12FX, and with soundcraft-utils for Notepad-5,
+The audio routing command been tested to work with `scnp-cli` for the
+Notepad-12FX, and with `soundcraft-utils` for Notepad-5,
 Notepad-8FX. and Notepad-12FX.
 
 
@@ -100,16 +100,17 @@ Ducker
 ======
 
 The Notepad-12FX has a ducker feature which can duck USB playback
-channels 1+2 (on the Notepad-12FX four channel USB playback device)
-when it detects a signal on any combination of the four channels going
-to the USB audio capture device.
+channels 1+2 (on the Notepad-12FX four channel USB playback device,
+playback channel 3+4 are not ducked) when it detects a signal on any
+combination of the four channels going to the USB audio capture
+device.
 
 TODO: What about the 8FX with its two MIC channels and two channel
       Audio capture? What about the Notepad-5 with its single MIC
       channel, two channel Audio interface and no FX engine?
-
       Screenshots from the Windows/MacOS vendor software with one of
-      those devices connected might be helpful here, even without packet dumps.
+      those devices connected might be helpful here, even without
+      packet dumps.
 
 The ducker is not mentioned at all in the user manual for the Notepad
 series of mixers, but it can be turned on and off and its parameters
@@ -117,11 +118,11 @@ tuned in the "Ducker" tab of Soundcraft's MacOS (and presumably
 Windows) software.
 
 Note: The ducker information is still preliminary, and needs testing,
-      especially on devices other than a Notepad-12FX, if those even
-      support that feature.
+      especially on devices other than a Notepad-12FX, if those other
+      devices even support the ducker feature.
 
-The following command (play is from the sox "audio swiss army knife")
-can be helpful for testing the ducker:
+The following command (`play` is part of the sox sound file conversion
+tool) can be helpful for testing the ducker:
 
     play -n synth whitenoise
 
@@ -163,8 +164,6 @@ ducker-range command
 --------------------
 
 CONTROL OUT message with endpoint 0 setting the "Duck range":
-
-    00 00 02 81 1f ff ff ff
 
     00 00 02 81 00 00 4a 67
                 ┗━━━━━━━━━┩
@@ -208,12 +207,10 @@ Weirdly enough, the reply data appear to contain a LITTLE ENDIAN 24 or
 32bit value (we will call it 32bit for convenience, as byte 3 is
 always 0x00 anyway):
 
-    d0 00 00 00 00 00 00 00
-    ff ff 7f 00 00 00 00 00
     00 00 80 00 00 00 00 00
     ┗━━━━━━┩
            └───────────────── meter value
                               observed range: 0x00008e .. 0x800000
 
-TODO: The conversion from the integer values to the meter dB values
-      the vendor GUI shows is unknown at this time.
+TODO: How exactly does the integer value range 0x000000 .. 0x800000
+      map to the meter dB value range the vendor GUI shows?
