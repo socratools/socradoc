@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Run this interactively if you want to exercise most of the code.
+
+set -ex
+
+@abs_top_builddir@/scnp-cli --help
+@abs_top_builddir@/scnp-cli --version
+@abs_top_builddir@/scnp-cli audio-routing 0
+@abs_top_builddir@/scnp-cli ducker-off
+@abs_top_builddir@/scnp-cli ducker-on 2 2000ms
+@abs_top_builddir@/scnp-cli ducker-range 20dB
+@abs_top_builddir@/scnp-cli ducker-threshold -55dB
+@abs_top_builddir@/scnp-cli meter

@@ -10,6 +10,7 @@ doc_DATA =
 EXTRA_DIST =
 man1_MANS =
 noinst_DATA =
+noinst_SCRIPTS =
 TESTS =
 XFAIL_TESTS =
 
