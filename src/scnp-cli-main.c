@@ -220,13 +220,48 @@ const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct)
 }
 
 
+
 static
-void device_send_ctrl_message(libusb_device *dev,
+void device_recv_ctrl_message(libusb_device_handle *device_handle,
                               uint8_t *data, const size_t data_size)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_send_ctrl_message(libusb_device *dev,
+void device_recv_ctrl_message(libusb_device_handle *device_handle,
+                              uint8_t *data, const size_t data_size)
+{
+    COND_OR_FAIL(data_size < UINT16_MAX, "data_size exceeds uint16_t range");
+    const uint16_t u16_data_size = (uint16_t) data_size;
+
+    COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
+
+    const int luret_ctrl_transfer =
+        libusb_control_transfer(device_handle,
+                                0xc0 /* bmRequestType */,
+                                16 /* bRequest */,
+                                0 /* wValue */,
+                                0 /* wIndex */,
+                                data, u16_data_size,
+                                10000 /* timeout in ms */);
+    LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
+    COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
+                 "libusb_control_transfer");
+
+#if 0
+    printf("device_recv_ctrl_message got {%02x %02x %02x %02x %02x %02x %02x %02x}\n",
+           data[0], data[1], data[2], data[3],
+           data[4], data[5], data[6], data[7]);
+#endif
+}
+
+
+static
+void device_send_ctrl_message(libusb_device_handle *device_handle,
+                              uint8_t *data, const size_t data_size)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+void device_send_ctrl_message(libusb_device_handle *device_handle,
                               uint8_t *data, const size_t data_size)
 {
     COND_OR_FAIL(data_size < UINT16_MAX, "data_size exceeds uint16_t range");
@@ -237,13 +272,8 @@ void device_send_ctrl_message(libusb_device *dev,
            data[0], data[1], data[2], data[3],
            data[4], data[5], data[6], data[7]);
 
-    libusb_device_handle *dev_handle;
-    const int luret_open =
-        libusb_open(dev, &dev_handle);
-    LIBUSB_OR_FAIL(luret_open, "libusb_open");
-
     const int luret_ctrl_transfer =
-        libusb_control_transfer(dev_handle,
+        libusb_control_transfer(device_handle,
                                 0x40 /* bmRequestType */,
                                 16 /* bRequest */,
                                 0 /* wValue */,
@@ -253,19 +283,17 @@ void device_send_ctrl_message(libusb_device *dev,
     LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
     COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
                  "libusb_control_transfer");
-
-    libusb_close(dev_handle);
 }
 
 
 static
-void device_audio_routing(libusb_device *dev,
+void device_audio_routing(libusb_device_handle *device_handle,
                           const notepad_device_T *const notepad_device,
                           const uint8_t src_idx)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_audio_routing(libusb_device *dev,
+void device_audio_routing(libusb_device_handle *device_handle,
                           const notepad_device_T *const notepad_device,
                           const uint8_t src_idx)
 {
@@ -282,20 +310,89 @@ void device_audio_routing(libusb_device *dev,
     data[6] = 0x00;
     data[7] = 0x00;
 
-    device_send_ctrl_message(dev, data, sizeof(data));
+    device_send_ctrl_message(device_handle, data, sizeof(data));
 }
 
 
 static
-void device_ducker_off(libusb_device *dev,
+void device_meter(libusb_device_handle *device_handle,
+                  const notepad_device_T *const notepad_device)
+    __attribute__(( nonnull(1), nonnull(2), noreturn ));
+
+static
+void device_meter(libusb_device_handle *device_handle,
+                  const notepad_device_T *const notepad_device)
+{
+    printf("meter for %s. Press Ctrl-C to quit.\n", notepad_device->name);
+
+    uint8_t data[8];
+
+    uint32_t min_value = 0xffffffff;
+    uint32_t max_value = 0x00000000;
+
+#define METER_WIDTH 64UL
+
+    static char meterbuf[76];
+    for (size_t i=1; i<1+METER_WIDTH; ++i) {
+        meterbuf[i] = '-';
+    }
+    meterbuf[0] = '[';
+    meterbuf[1+METER_WIDTH] = ']';
+    meterbuf[2+METER_WIDTH] = '\0';
+
+    while (true) {
+        device_recv_ctrl_message(device_handle, data, sizeof(data));
+        const uint32_t cur_value =
+            (((uint32_t)data[0])<< 0) |
+            (((uint32_t)data[1])<< 8) |
+            (((uint32_t)data[2])<<16) |
+            (((uint32_t)data[3])<<24);
+        if (cur_value < min_value) {
+            min_value = cur_value;
+        }
+        if (cur_value > max_value) {
+            max_value = cur_value;
+        }
+#if 0
+        printf("meter"
+               " min=0x%08x=%-9u"
+               " <="
+               " cur=0x%08x=%-9u"
+               " <="
+               " max=0x%08x=%-9u"
+               "\n",
+               min_value, min_value,
+               cur_value, cur_value,
+               max_value, max_value);
+#endif
+
+        const uint32_t idx = (METER_WIDTH * cur_value) / 0x800000UL;
+        COND_OR_FAIL(((0 <= idx) && (idx <= METER_WIDTH)), "programmer error");
+        for (size_t i=1; i<1+idx; ++i) {
+            meterbuf[i] = '#';
+        }
+        for (size_t i=1+idx; i<1+METER_WIDTH; ++i) {
+            meterbuf[i] = '-';
+        }
+        printf("0x%08x %2u %s\r", cur_value, idx, meterbuf);
+
+        const struct timespec req = { 0L, 50L*1000L*1000L };
+        struct timespec rem;
+        (void) nanosleep(&req, &rem);
+    }
+}
+
+
+static
+void device_ducker_off(libusb_device_handle *device_handle,
                         const notepad_device_T *const notepad_device)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_ducker_off(libusb_device *device,
+void device_ducker_off(libusb_device_handle *device_handle,
                         const notepad_device_T *const notepad_device)
 {
-    printf("FIXME ducker_off %s\n", notepad_device->name);
+    printf("ducker-off %s\n", notepad_device->name);
 
     uint8_t data[8];
     data[0] = 0x00;
@@ -307,25 +404,25 @@ void device_ducker_off(libusb_device *device,
     data[6] = 0x00;
     data[7] = 0x00;
 
-    device_send_ctrl_message(device, data, sizeof(data));
+    device_send_ctrl_message(device_handle, data, sizeof(data));
 }
 
 
 static
-void device_ducker_on(libusb_device *device,
+void device_ducker_on(libusb_device_handle *device_handle,
                        const notepad_device_T *const notepad_device,
                        const uint8_t inputs, const uint16_t release_ms)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_ducker_on(libusb_device *device,
+void device_ducker_on(libusb_device_handle *device_handle,
                        const notepad_device_T *const notepad_device,
                        const uint8_t inputs, const uint16_t release_ms)
 {
     COND_OR_FAIL(inputs < 16, "inputs bitmap out of range (0b0000 to 0b1111)");
     COND_OR_FAIL(release_ms <= 5000, "release_ms out of range (0 to 5000ms)");
 
-    printf("FIXME ducker_on inputs=%u release_ms=%u %s\n",
+    printf("ducker-on inputs=%u release_ms=%u %s\n",
            inputs, release_ms, notepad_device->name);
 
     uint8_t data[8];
@@ -338,25 +435,25 @@ void device_ducker_on(libusb_device *device,
     data[6] = ((release_ms>>8) & 0xff);
     data[7] = ((release_ms>>0) & 0xff);
 
-    device_send_ctrl_message(device, data, sizeof(data));
+    device_send_ctrl_message(device_handle, data, sizeof(data));
 }
 
 
 static
-void device_ducker_range(libusb_device *device,
+void device_ducker_range(libusb_device_handle *device_handle,
                          const notepad_device_T *const notepad_device,
                          const uint32_t range_value)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_ducker_range(libusb_device *device,
+void device_ducker_range(libusb_device_handle *device_handle,
                          const notepad_device_T *const notepad_device,
                          const uint32_t range_value)
 {
     COND_OR_FAIL(range_value <= 0x1fffffff,
                  "ducker range value outside of numeric range");
 
-    printf("FIXME ducker_range range=0x%x=%u %s\n",
+    printf("ducker-range range=0x%x=%u %s\n",
            range_value, range_value, notepad_device->name);
 
     uint8_t data[8];
@@ -369,25 +466,25 @@ void device_ducker_range(libusb_device *device,
     data[6] = ((range_value>> 8) & 0xff);
     data[7] = ((range_value>> 0) & 0xff);
 
-    device_send_ctrl_message(device, data, sizeof(data));
+    device_send_ctrl_message(device_handle, data, sizeof(data));
 }
 
 
 static
-void device_ducker_threshold(libusb_device *device,
+void device_ducker_threshold(libusb_device_handle *device_handle,
                              const notepad_device_T *const notepad_device,
                              const uint32_t thresh_value)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_ducker_threshold(libusb_device *device,
+void device_ducker_threshold(libusb_device_handle *device_handle,
                              const notepad_device_T *const notepad_device,
                              const uint32_t thresh_value)
 {
     COND_OR_FAIL(thresh_value <= 0x007fffff,
                  "ducker threshold value outside of numeric range");
 
-    printf("FIXME ducker_threshold thresh=%u %s\n",
+    printf("ducker-threshold thresh=%u %s\n",
            thresh_value, notepad_device->name);
 
     uint8_t data[8];
@@ -400,7 +497,7 @@ void device_ducker_threshold(libusb_device *device,
     data[6] = ((thresh_value>> 8) & 0xff);
     data[7] = ((thresh_value>> 0) & 0xff);
 
-    device_send_ctrl_message(device, data, sizeof(data));
+    device_send_ctrl_message(device_handle, data, sizeof(data));
 }
 
 
@@ -424,69 +521,87 @@ typedef union {
 } command_params_T;
 
 
-typedef void (*command_func_T)(libusb_device *device,
+typedef void (*command_func_T)(libusb_device_handle *device_handle,
                                const notepad_device_T *const notepad_device,
                                command_params_T *params);
 
 
 static
-void commandfunc_audio_routing(libusb_device *device,
+void commandfunc_audio_routing(libusb_device_handle *device_handle,
                                const notepad_device_T *const notepad_device,
                                command_params_T *params)
 {
-    device_audio_routing(device, notepad_device,
+    device_audio_routing(device_handle, notepad_device,
                          params->audio_routing.source_index);
 }
 
 
 static
-void commandfunc_ducker_off(libusb_device *device,
+void commandfunc_meter(libusb_device_handle *device_handle,
+                       const notepad_device_T *const notepad_device,
+                       command_params_T *params __attribute__(( unused )) )
+    __attribute__(( noreturn ));
+
+static
+void commandfunc_meter(libusb_device_handle *device_handle,
+                       const notepad_device_T *const notepad_device,
+                       command_params_T *params __attribute__(( unused )) )
+{
+    /* TODO: Move this check to device list generation code */
+    COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
+
+    device_meter(device_handle, notepad_device);
+}
+
+
+static
+void commandfunc_ducker_off(libusb_device_handle *device_handle,
                              const notepad_device_T *const notepad_device,
                              command_params_T *params __attribute__(( unused )) )
 {
     /* TODO: Move this check to device list generation code */
     COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
 
-    device_ducker_off(device, notepad_device);
+    device_ducker_off(device_handle, notepad_device);
 }
 
 
 static
-void commandfunc_ducker_on(libusb_device *device,
+void commandfunc_ducker_on(libusb_device_handle *device_handle,
                             const notepad_device_T *const notepad_device,
                             command_params_T *params)
 {
     /* TODO: Move this check to device list generation code */
     COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
 
-    device_ducker_on(device, notepad_device,
+    device_ducker_on(device_handle, notepad_device,
                       params->ducker_on.inputs,
                       params->ducker_on.release_ms);
 }
 
 
 static
-void commandfunc_ducker_range(libusb_device *device,
+void commandfunc_ducker_range(libusb_device_handle *device_handle,
                               const notepad_device_T *const notepad_device,
                               command_params_T *params)
 {
     /* TODO: Move this check to device list generation code */
     COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
 
-    device_ducker_range(device, notepad_device,
+    device_ducker_range(device_handle, notepad_device,
                         params->ducker_range.range);
 }
 
 
 static
-void commandfunc_ducker_threshold(libusb_device *device,
+void commandfunc_ducker_threshold(libusb_device_handle *device_handle,
                                   const notepad_device_T *const notepad_device,
                                   command_params_T *params)
 {
     /* TODO: Move this check to device list generation code */
     COND_OR_FAIL(notepad_device->ducker, "device does not support ducker");
 
-    device_ducker_threshold(device, notepad_device,
+    device_ducker_threshold(device_handle, notepad_device,
                             params->ducker_threshold.thresh);
 }
 
@@ -527,7 +642,14 @@ void run_command(command_func_T command_func,
         notepad_device_from_idProduct(desc.idProduct);
     COND_OR_FAIL(notepad_device != NULL, "unhandled idProduct");
 
-    command_func(device, notepad_device, command_params);
+    libusb_device_handle *device_handle;
+    const int luret_open =
+        libusb_open(device, &device_handle);
+    LIBUSB_OR_FAIL(luret_open, "libusb_open");
+
+    command_func(device_handle, notepad_device, command_params);
+
+    libusb_close(device_handle);
 
     for (ssize_t i=0; i<dev_count; ++i) {
         libusb_unref_device(dev_list[i]);
@@ -626,6 +748,9 @@ void print_usage(const char *const prog)
            "               Valid range is -60dB to 0dB, or 0x000000 to 0x7fffff.\n"
            "               It may be best to only use this while ducker is on.\n"
            "\n"
+           "    meter\n"
+           "               Show the meter until you press Ctrl-C\n"
+           "\n"
            "Example:\n"
            "\n"
            "    [user@host ~]$ scnp-cli audio-routing 2\n"
@@ -718,6 +843,11 @@ int parse_cmdline(const int argc, const char *const argv[])
         params.audio_routing.source_index = source_index;
         run_command(commandfunc_audio_routing, &params);
 
+        return EXIT_SUCCESS;
+    } else if ((argc == 2) && (strcmp(argv[1], "meter") == 0)) {
+        command_params_T params;
+        /* no params needed to run the meter */
+        run_command(commandfunc_meter, &params);
         return EXIT_SUCCESS;
     } else if ((argc == 2) && (strcmp(argv[1], "ducker-off") == 0)) {
         command_params_T params;

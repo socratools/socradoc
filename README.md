@@ -92,6 +92,9 @@ Commands:
                Valid range is -60dB to 0dB, or 0x000000 to 0x7fffff.
                It may be best to only use this while ducker is on.
 
+    meter
+               Show the meter until you press Ctrl-C
+
 Example:
 
     [user@host ~]$ scnp-cli audio-routing 2
