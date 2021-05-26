@@ -50,6 +50,8 @@ NDIM_PATH_PROG([wc])
 # Checks for libraries.
 ########################################################################
 
+AC_CHECK_LIB([m], [floor])
+
 m4_pattern_forbid([^PKG_CHECK_MODULES])dnl
 PKG_CHECK_MODULES([LIBUSB10], [libusb-1.0])
 
