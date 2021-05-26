@@ -9,9 +9,10 @@ and the mixer state that protocol communicates about.
 General packet format
 =====================
 
-The observed USB control request packets all have these properties:
+The observed USB control OUT request packets all have these
+properties:
 
-    USB Control transfer with
+    USB Control OUT transfer with
          0x40  bmRequestType
          16    bRequest
          0     wValue
@@ -129,8 +130,6 @@ ducker while the ducker is actually enabled both in the GUI and on the
 mixer, it might be prudent to do the same in other software
 implementations.
 
-TODO: How to observe the meter value?
-
 
 ducker-off and ducker-on command
 --------------------------------
@@ -148,6 +147,11 @@ same time:
 
 The four (in the case of the Notepad-12FX) inputs we can select from
 are the same four channels of the USB audio capture device.
+
+    0001  1  INPUT 1
+    0010  2  INPUT 2
+    0100  4  INPUT 3
+    1000  8  INPUT 4
 
 This means that the ducker behaviour of the mixer depends on the last
 "Audio Routing" command. And there is a curiously weird edge case
@@ -185,3 +189,31 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
 
 TODO: How exactly does -60dB .. 0dB range map to the 0x0020c3 (or
       perhaps even 0x000000?) .. 0x7fffff range and back?
+
+
+meter
+-----
+
+It appears that the vendor software just issues a USB Ctrl IN Request
+every 0.05s where the 8 byte reply buffer then contains the meter
+value:
+
+    USB Control IN transfer with
+         0xc0  bmRequestType
+         16    bRequest
+         0     wValue
+         0     wIndex
+
+Weirdly enough, the reply data appear to contain a LITTLE ENDIAN 24 or
+32bit value (we will call it 32bit for convenience, as byte 3 is
+always 0x00 anyway):
+
+    d0 00 00 00 00 00 00 00
+    ff ff 7f 00 00 00 00 00
+    00 00 80 00 00 00 00 00
+    ┗━━━━━━┩
+           └───────────────── meter value
+                              observed range: 0x00008e .. 0x800000
+
+TODO: The conversion from the integer values to the meter dB values
+      the vendor GUI shows is unknown at this time.
