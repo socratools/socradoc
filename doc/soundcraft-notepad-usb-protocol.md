@@ -208,9 +208,10 @@ Weirdly enough, the reply data appear to contain a LITTLE ENDIAN 24 or
 always 0x00 anyway):
 
     00 00 80 00 00 00 00 00
-    ┗━━━━━━┩
-           └───────────────── meter value
-                              observed range: 0x00008e .. 0x800000
+    ┗━━━━━━━━━┩
+              └────────────── meter value in LITTLE ENDIAN!
+                              observed range: 0x0000008e .. 0x010007bd
+                              continuously 0x00000000 while is ducker off
 
-TODO: How exactly does the integer value range 0x000000 .. 0x800000
+TODO: How exactly does the integer value range 0x000000 .. 0x010007bd
       map to the meter dB value range the vendor GUI shows?
