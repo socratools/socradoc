@@ -481,8 +481,18 @@ void usbdev_meter(usbdev_T *usbdev)
                max_value, max_value);
 #endif
 
-        const uint32_t idx = (METER_WIDTH * cur_value) / 0x800000UL;
-        COND_OR_FAIL((idx <= METER_WIDTH), "programmer error");
+        /* FIXME: This function is not a proper mapping from uint32_t
+         *        to whatever dB value the GUI is supposed to show.
+         */
+        const uint32_t raw_idx = (METER_WIDTH * cur_value) / 0x1001000UL;
+
+        /* clamp idx value to the [0..METER_WIDTH] interval */
+        const uint32_t idx = (raw_idx > METER_WIDTH) ? METER_WIDTH : raw_idx;
+
+        if (idx > METER_WIDTH) {
+            printf("METER_WIDTH! raw_idx=%u cur_value=0x%08x=%u\n",
+                   raw_idx, cur_value, cur_value);
+        }
         for (size_t i=1; i<1+idx; ++i) {
             meterbuf[i] = '#';
         }
