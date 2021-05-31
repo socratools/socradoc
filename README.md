@@ -106,6 +106,7 @@ For building `scnp-cli`, you need at least
   * make (GNU make is helpful)
   * `libusb-1.0.pc` (from OS package like `libusbx-devel` or `libusb-1.0-0-dev`)
   * pkg-config command (from pkg-config or pkgconf package)
+  * strongly recommended: bash-completion
 
 For building from a git source tree, you also need at least
 

@@ -1,0 +1,60 @@
+# bash completion script for the scnp-cli command   -*- shell-script -*-
+
+_scnp_cli()
+{
+    # $1 is the command name
+    # $2 is the word being completed
+    # $3 is the preceding word
+    case "$3" in
+        scnp-cli | */scnp-cli)
+            COMPREPLY=($(compgen -W "audio-routing ducker-off ducker-on ducker-range ducker-threshold meter" "$2"))
+            return
+            ;;
+        audio-routing)
+            COMPREPLY=($(compgen -W "0 1 2 3" "$2"))
+            return
+            ;;
+        ducker-off)
+            return
+            ;;
+        ducker-on)
+            COMPREPLY=($(compgen -W "$(seq 0 15)" "$2"))
+            return
+            ;;
+        ducker-range)
+            case "$2" in
+                0x*)
+                    COMPREPLY=($(compgen -W "$(for n in $(seq 0 "$(printf "%u\n" 0x8000)" "$(printf "%u\n" 0x007fffff)"); do printf "0x%x\n" "$n"; done)" "$2"))
+                    ;;
+                *)
+                    COMPREPLY=($(compgen -W "$(seq -f "%.0fdB" 0 90)" "$2"))
+                    ;;
+            esac
+            return
+            ;;
+        ducker-threshold)
+            case "$2" in
+                0x*)
+                    COMPREPLY=($(compgen -W "$(for n in $(seq 0 "$(printf "%u\n" 0x200000)" "$(printf "%u\n" 0x1fffffff)"); do printf "0x%x\n" "$n"; done)" "$2"))
+                    ;;
+                *)
+                    COMPREPLY=($(compgen -W "$(seq -f "%.0fdB" -60 0)" -- "$2"))
+                    ;;
+            esac
+            return
+            ;;
+        meter)
+            return
+            ;;
+    esac
+    # word preceding the preceding word
+    local i="$(( "$COMP_CWORD" - 2 ))"
+    case "${COMP_WORDS[$i]}" in
+        ducker-on)
+            COMPREPLY=($(compgen -W "$(seq -f "%.0fms" 0 100 5000)" "$2"))
+            return
+            ;;
+    esac
+    return
+} &&
+    complete -F _scnp_cli "scnp-cli"

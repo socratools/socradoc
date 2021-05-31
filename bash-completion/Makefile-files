@@ -1,0 +1,4 @@
+# -*- makefile -*-
+
+EXTRA_DIST          += %reldir%/scnp-cli
+bashcompletion_DATA += %reldir%/scnp-cli

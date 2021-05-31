@@ -6,6 +6,7 @@ AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
 ########################################################################
 
 bin_PROGRAMS =
+bashcompletion_DATA =
 check_PROGRAMS =
 check_SCRIPTS =
 BUILT_SOURCES =
@@ -23,6 +24,7 @@ XFAIL_TESTS =
 include build-helpers/package-version.mk
 
 include Makefile-files
+include bash-completion/Makefile-files
 include doc/Makefile-files
 include include/Makefile-files
 include m4/Makefile-files

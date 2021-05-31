@@ -47,13 +47,64 @@ NDIM_PATH_PROG([wc])
 
 
 ########################################################################
-# Checks for libraries.
+# Checks for libraries and other packages
 ########################################################################
+
+
+########################################################################
+# Do we actually need -lm for using floor()?
 
 AC_CHECK_LIB([m], [floor])
 
+
+########################################################################
+# Look for libusb-1.0
+
 m4_pattern_forbid([^PKG_CHECK_MODULES])dnl
 PKG_CHECK_MODULES([LIBUSB10], [libusb-1.0])
+
+
+########################################################################
+# Figure out where to install the bash-completion file
+
+AC_MSG_CHECKING([whether installing somewhere inside \$HOME])
+AS_CASE([$prefix],
+        [$HOME/*],
+        [is_home_installation=yes],
+        [is_home_installation=no])
+AC_MSG_RESULT([$is_home_installation])
+
+AC_MSG_CHECKING([per-user BASH_COMPLETION_USER_DIR])
+AS_VAR_IF([BASH_COMPLETION_USER_DIR], [], [dnl
+  AS_VAR_IF([XDG_DATA_HOME], [], [dnl
+    BASH_COMPLETION_USER_DIR="$HOME/.local/share/bash-completion"
+  ], [
+    BASH_COMPLETION_USER_DIR="$XDG_DATA_HOME/bash-completion"
+  ])
+])
+
+AC_MSG_RESULT([$BASH_COMPLETION_USER_DIR])
+user_bashcompletiondir="$BASH_COMPLETION_USER_DIR/completions"
+AC_MSG_CHECKING([for per-user bash completion install dir])
+AC_MSG_RESULT([$user_bashcompletiondir])
+
+m4_pattern_forbid([^PKG_CHECK_VAR])dnl
+AC_MSG_CHECKING([system bash completion directory])
+PKG_CHECK_VAR([system_bashcompletiondir],
+              [bash-completion],
+              [completionsdir],
+              [AC_MSG_RESULT([default $system_bashcompletiondir])],
+              [system_bashcompletiondir="${sysconfdir}/bash_completion.d"
+               AC_MSG_RESULT([fallback $system_bashcompletiondir])])
+
+AC_MSG_CHECKING([where to install bash completion files])
+AC_ARG_VAR([bashcompletiondir], [where to install bash completion files])
+AS_VAR_IF([bashcompletiondir], [], [dnl
+  AS_VAR_IF([is_home_installation], [yes],
+            [bashcompletiondir="$user_bashcompletiondir"],
+            [bashcompletiondir="$system_bashcompletiondir"])
+])
+AC_MSG_RESULT([$bashcompletiondir])
 
 
 ########################################################################
