@@ -743,7 +743,8 @@ void print_usage(const char *const prog)
            "    ducker-on <INPUTS> <RELEASE>ms\n"
            "               Turn the ducker on and set the following values:\n"
            "                 INPUTS (range 0..15) is a bitmask for the input \"selection\"\n"
-           "                         0 = no inputs watched, 15 = all four inputs watched\n"
+           "                         0b0000 =  0 = no inputs watched\n"
+           "                         0b1111 = 15 = all four inputs watched\n"
            "                 RELEASE (range 0..5000) is a the \"release\" time in ms\n"
            "                         0 = release time 0, 5000 = release time 5000ms=5s\n"
            "\n"
@@ -869,7 +870,13 @@ int parse_cmdline(const int argc, const char *const argv[])
                 fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
                 return EXIT_FAILURE;
             }
-            const long lval = strtol(argv[2], &p, 0);
+            long lval;
+            if (strncmp("0b", argv[2], 2) == 0) {
+                lval = strtol(&argv[2][2], &p, 2);
+            } else {
+                lval = strtol(argv[2], &p, 0);
+            }
+            // fprintf(stderr, "value conversion: %s to %ld\n", argv[2], lval);
             if ((p == NULL) || (*p != '\0')) {
                 fprintf(stderr, "Fatal: Error converting number\n");
                 return EXIT_FAILURE;
