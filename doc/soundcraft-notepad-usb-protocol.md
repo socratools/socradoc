@@ -101,8 +101,8 @@ Ducker
 
 The Notepad-12FX has a ducker feature which can duck USB playback
 channels 1+2 (on the Notepad-12FX four channel USB playback device,
-playback channel 3+4 are not ducked) when it detects a signal on any
-combination of the four channels going to the USB audio capture
+USB playback channels 3+4 are not ducked) when it detects a signal on
+any combination of the four channels going to the USB audio capture
 device.
 
 TODO: What about the 8FX with its two MIC channels and two channel
