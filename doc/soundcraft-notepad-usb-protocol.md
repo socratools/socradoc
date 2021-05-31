@@ -203,11 +203,10 @@ value:
          0     wValue
          0     wIndex
 
-Weirdly enough, the reply data appear to contain a LITTLE ENDIAN 24 or
-32bit value (we will call it 32bit for convenience, as byte 3 is
-always 0x00 anyway):
+Weirdly enough, the reply data appear to contain a LITTLE ENDIAN 32bit
+value:
 
-    00 00 80 00 00 00 00 00
+    bd 07 00 01 00 00 00 00
     ┗━━━━━━━━━┩
               └────────────── meter value in LITTLE ENDIAN!
                               observed range: 0x0000008e .. 0x010007bd
