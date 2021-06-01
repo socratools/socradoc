@@ -180,6 +180,13 @@ plausible:
     dB_value = 20 * log10 |  ------------  |
                            \  0x20000000  /
 
+With the inverse function mapping dB values to integer values being
+
+                                 / dB_value \
+                                | ---------- |
+                                 \    20    /
+    uint_value = 0x20000000 * 10
+
 TODO: What is a reasonable dB range value a GUI could start with?
 
 
@@ -200,6 +207,13 @@ plausible:
                            /  uint_value  \
     dB_value = 20 * log10 |  ------------  |
                            \   0x800000   /
+
+With the inverse function mapping dB values to integer values being
+
+                                 / dB_value \
+                                | ---------- |
+                                 \    20    /
+    uint_value = 0x800000 * 10
 
 TODO: What is a reasonable dB threshold value a GUI could start with?
 
