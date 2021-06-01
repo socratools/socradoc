@@ -171,8 +171,12 @@ CONTROL OUT message with endpoint 0 setting the "Duck range":
                               observed range is 0x1fff_ffff to 0x0000_4a67
                               corresponding to displayed values of 0dB to 90dB
 
-TODO: How exactly does the 0dB .. 90dB range map to the 0x1fff_ffff
-      .. 0x0000_4a67 (or perhaps even 0x0000_0000?) range and back?
+To map the integer values to dB values, the following equation looks
+plausible:
+
+                           /  uint_value  \
+    dB_value = 20 * log10 |  ------------  |
+                           \  0x20000000  /
 
 
 ducker-threshold command
@@ -186,8 +190,12 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
                               observed range is 0x20c3=8387 to 0x7fffff=8388607
                               corresponding to displayed values of -60dB to 0dB
 
-TODO: How exactly does -60dB .. 0dB range map to the 0x0020c3 (or
-      perhaps even 0x000000?) .. 0x7fffff range and back?
+To map the integer values to dB values, the following equation looks
+plausible:
+
+                           /  uint_value  \
+    dB_value = 20 * log10 |  ------------  |
+                           \   0x800000   /
 
 
 meter
@@ -212,5 +220,9 @@ value:
                               observed range: 0x0000008e .. 0x010007bd
                               continuously 0x00000000 while is ducker off
 
-TODO: How exactly does the integer value range 0x000000 .. 0x010007bd
-      map to the meter dB value range the vendor GUI shows?
+To map the integer values to dB values, the following equation looks
+plausible:
+
+                           /  uint_value  \
+    dB_value = 20 * log10 |  ------------  |
+                           \  0x01000000  /
