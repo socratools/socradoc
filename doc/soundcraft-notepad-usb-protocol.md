@@ -159,6 +159,8 @@ This means that the ducker behaviour of the mixer depends on the last
 here: When the Audio Routing is set to 3 (Mix L+R), the USB output
 channel 1+2 signal is mixed into MIX L+R, and thus ducks itself!
 
+TODO: What is a reasonable ms release value a GUI could start with?
+
 
 ducker-range command
 --------------------
@@ -178,6 +180,8 @@ plausible:
     dB_value = 20 * log10 |  ------------  |
                            \  0x20000000  /
 
+TODO: What is a reasonable dB range value a GUI could start with?
+
 
 ducker-threshold command
 ------------------------
@@ -196,6 +200,8 @@ plausible:
                            /  uint_value  \
     dB_value = 20 * log10 |  ------------  |
                            \   0x800000   /
+
+TODO: What is a reasonable dB threshold value a GUI could start with?
 
 
 meter
