@@ -246,3 +246,7 @@ plausible:
                            /  uint_value  \
     dB_value = 20 * log10 |  ------------  |
                            \  0x01000000  /
+
+For an integer range of 0x8e .. 0x010007bd, this corresponds to
+-101.449dB .. 0.001dB, so some value clamping to the interval -100.0dB
+.. 0.0dB appears to be in order.
