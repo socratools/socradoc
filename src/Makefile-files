@@ -12,6 +12,9 @@ scnp_cli_SOURCES  += %reldir%/scnp-cli-main.c
 # for reallocarray(3)
 scnp_cli_CPPFLAGS += -D_DEFAULT_SOURCE
 
+# for exp10(3) (FIXME: Use exp10 only if available)
+scnp_cli_CPPFLAGS += -D_GNU_SOURCE
+
 scnp_cli_CPPFLAGS += -I$(top_builddir)/include
 scnp_cli_CFLAGS   += $(PEDANTIC_C11_CFLAGS)
 

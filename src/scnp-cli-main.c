@@ -61,6 +61,34 @@ uint32_t dry_run_value = 0x00001000;
     } while (0)
 
 
+#define BE_LONG_OR_FAIL(SMALLER, BIGGER)                                \
+    do {                                                                \
+        const long smaller = (SMALLER);                                 \
+        const long bigger = (BIGGER);                                   \
+        if (smaller > bigger) {                                         \
+            fprintf(stderr,                                             \
+                    "Fatal: %s=%ld=0x%08lx above %s=%ld=0x%08lx\n",     \
+                    #SMALLER, smaller, smaller,                         \
+                    #BIGGER, bigger, bigger);                           \
+            exit(EXIT_FAILURE);                                         \
+        }                                                               \
+    } while (0)
+
+
+#define BE_UINT32_OR_FAIL(SMALLER, BIGGER)                              \
+    do {                                                                \
+        const uint32_t smaller = (SMALLER);                             \
+        const uint32_t bigger = (BIGGER);                               \
+        if (smaller > bigger) {                                         \
+            fprintf(stderr,                                             \
+                    "Fatal: %s=%d=0x%08x above %s=%d=0x%08x\n",         \
+                    #SMALLER, smaller, smaller,                         \
+                    #BIGGER, bigger, bigger);                           \
+            exit(EXIT_FAILURE);                                         \
+        }                                                               \
+    } while (0)
+
+
 #define COND_OR_RETURN(COND, MSG)                                     \
     do {                                                              \
         const bool cond = (COND);                                     \
@@ -82,6 +110,65 @@ uint32_t dry_run_value = 0x00001000;
             exit(EXIT_FAILURE);                                       \
         }                                                             \
     } while (0)
+
+
+static
+uint32_t dB_to_uint(const uint32_t ref_value, const double dB_value)
+{
+    const double d_ref_value = ref_value;
+    /* For portability to non-glibc systems, we should offer a
+       reimplementation of exp10(e) */
+    const double d_uint_value = d_ref_value * exp10(dB_value/20.0);
+    const long long_uint_value = lround(d_uint_value);
+    BE_LONG_OR_FAIL(0L, long_uint_value);
+    BE_LONG_OR_FAIL(long_uint_value, ref_value);
+    const uint32_t retval = (uint32_t) long_uint_value;
+    return retval;
+}
+
+
+static
+double uint_to_dB(const uint32_t ref_value, const uint32_t uint_value)
+{
+    const double d_ref = ref_value;
+    const double d_uint = uint_value;
+    const double d_dB = 20.0 * log10(d_uint/d_ref);
+    return d_dB;
+}
+
+
+#define REF_VALUE_RANGE     0x1fffffffUL
+#define REF_VALUE_THRESHOLD 0x007fffffUL
+#define REF_VALUE_METER     0x00ffffffUL
+
+
+static
+uint32_t dB_to_uint_range(const double range_dB)
+{
+    /* note the tiny "negative" sign */
+    return dB_to_uint(REF_VALUE_RANGE, -range_dB);
+}
+
+
+static
+uint32_t dB_to_uint_threshold(const double thresh_dB)
+{
+    return dB_to_uint(REF_VALUE_THRESHOLD, thresh_dB);
+}
+
+
+static
+uint32_t dB_to_uint_meter(const double range_dB)
+{
+    return dB_to_uint(REF_VALUE_METER, range_dB);
+}
+
+
+static
+double uint_to_dB_meter(const uint32_t uint_value)
+{
+    return uint_to_dB(REF_VALUE_METER, uint_value);
+}
 
 
 #define NOTEPAD_SOURCES_MAX 4
@@ -410,8 +497,7 @@ static
 void usbdev_ducker_range(usbdev_T *usbdev,
                          const uint32_t range_value)
 {
-    COND_OR_FAIL(range_value <= 0x1fffffff,
-                 "ducker range value outside of numeric range");
+    BE_UINT32_OR_FAIL(range_value, 0x1fffffff);
 
     printf("ducker-range range=0x%x=%u %s\n",
            range_value, range_value, usbdev->notepad_device->name);
@@ -439,8 +525,7 @@ static
 void usbdev_ducker_threshold(usbdev_T *usbdev,
                              const uint32_t thresh_value)
 {
-    COND_OR_FAIL(thresh_value <= 0x007fffff,
-                 "ducker threshold value outside of numeric range");
+    BE_UINT32_OR_FAIL(thresh_value, 0x007fffff);
 
     printf("ducker-threshold thresh=0x%x=%u %s\n",
            thresh_value, thresh_value, usbdev->notepad_device->name);
@@ -510,18 +595,17 @@ void usbdev_meter(usbdev_T *usbdev)
                max_value, max_value);
 #endif
 
-        /* FIXME: This function is not a proper mapping from uint32_t
-         *        to whatever dB value the GUI is supposed to show.
-         */
-        const uint32_t raw_idx = (METER_WIDTH * cur_value) / 0x1001000UL;
+        /* original dB value can be slightly outside the -100.0 .. 0.0 range */
+        const double raw_dB = uint_to_dB_meter(cur_value);
+        const double raw_dB1 = (raw_dB < -100.0) ? -100.0 : raw_dB;
+        /* dB value constrained into -100.0 to 0.0 interval */
+        const double dB = (raw_dB1 > 0.0) ? 0.0 : raw_dB1;
 
-        /* clamp idx value to the [0..METER_WIDTH] interval */
-        const uint32_t idx = (raw_idx > METER_WIDTH) ? METER_WIDTH : raw_idx;
+        const double d_idx = ((100.0 + dB) * METER_WIDTH) * 0.01;
+        const uint32_t idx = (uint32_t) d_idx;
 
-        if (idx > METER_WIDTH) {
-            printf("METER_WIDTH! raw_idx=%u cur_value=0x%08x=%u\n",
-                   raw_idx, cur_value, cur_value);
-        }
+        COND_OR_FAIL(idx <= METER_WIDTH, "value range exceeded");
+
         for (size_t i=1; i<1+idx; ++i) {
             meterbuf[i] = '#';
         }
@@ -953,7 +1037,7 @@ int parse_command_ducker_range(const char *const param_range)
 
     if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
         if (lval < 0) {
-            fprintf(stderr, "Fatal: Error converting number: negative\n");
+            fprintf(stderr, "Fatal: Error converting number: below 0dB\n");
             return EXIT_FAILURE;
         }
         if (lval > UINT32_MAX) {
@@ -961,16 +1045,13 @@ int parse_command_ducker_range(const char *const param_range)
             return EXIT_FAILURE;
         }
         if (lval > 90) {
-            fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+            fprintf(stderr, "Fatal: Error converting number: above 90dB\n");
             return EXIT_FAILURE;
         }
         /* value range is now 0 .. 90 including */
-        const double fmax   = 0x1fffffff;
-        const double fsteps = 90;
-        const double fval   = (double) lval;
-        const double frange = floor(fval * fmax / fsteps);
-        const uint32_t u32range = (uint32_t) frange;
-        params.ducker_range.range = u32range;
+        const double dval   = (double) lval;
+        const uint32_t ui = dB_to_uint_range(dval);
+        params.ducker_range.range = ui;
     } else if (*p == '\0') { /* integer without a unit */
         if (lval < 0) {
             fprintf(stderr, "Fatal: Error converting number: negative\n");
@@ -1030,14 +1111,9 @@ int parse_command_ducker_threshold(const char *const param_threshold)
             return EXIT_FAILURE;
         }
         /* value range is now -60 .. 0 including */
-        const double fmax   = 0x7fffff;
-        const double fsteps = 60;
-        const double fval   = (double) (lval+60);
-        const double fthresh = floor(fval * fmax / fsteps);
-        const uint32_t u32thresh = (uint32_t) fthresh;
-
-        /* FIXME: thresh value 0x000000 basically means continually-ducked */
-        params.ducker_threshold.thresh = u32thresh;
+        const double dval = (double) lval;
+        const uint32_t ui = dB_to_uint_threshold(dval);
+        params.ducker_threshold.thresh = ui;
     } else if (*p == '\0') { /* integer without a unit */
         if (lval < 0) {
             fprintf(stderr, "Fatal: Error converting number: negative\n");
