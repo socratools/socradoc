@@ -800,13 +800,68 @@ int parse_command_audio_routing(const char *const param_sources)
 static
 int parse_command_audio_routing(const char *const param_sources)
 {
+    char *p = NULL;
+    errno = 0;
+    if (*(param_sources) == '\0') {
+        fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+        return EXIT_FAILURE;
+    }
+    const long lval = strtol(param_sources, &p, 10);
+    if ((p == NULL) || (*p != '\0')) {
+        fprintf(stderr, "Fatal: Error converting number\n");
+        return EXIT_FAILURE;
+    }
+    if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+        fprintf(stderr, "Fatal: Error converting number: number range\n");
+        return EXIT_FAILURE;
+    }
+    if (lval < 0) {
+        fprintf(stderr, "Fatal: Error converting number: negative\n");
+        return EXIT_FAILURE;
+    }
+    if (lval > UINT8_MAX) {
+        fprintf(stderr, "Fatal: Error converting number: too large\n");
+        return EXIT_FAILURE;
+    }
+
+    // printf("audio-routing lval=%ld\n", lval);
+    const uint8_t source_index = (uint8_t) lval;
+    COND_OR_RETURN(source_index < NOTEPAD_SOURCES_MAX,
+                   "sources index must be less than 4");
+
+    command_params_T params;
+    params.audio_routing.source_index = source_index;
+
+    run_command(commandfunc_audio_routing, &params);
+    return EXIT_SUCCESS;
+}
+
+
+static
+int parse_command_ducker_on(const char *const param_inputs,
+                            const char *const param_release_ms)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+int parse_command_ducker_on(const char *const param_inputs,
+                            const char *const param_release)
+{
+    command_params_T params;
+
+    if (true) {
         char *p = NULL;
         errno = 0;
-        if (*(param_sources) == '\0') {
+        if (*(param_inputs) == '\0') {
             fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
             return EXIT_FAILURE;
         }
-        const long lval = strtol(param_sources, &p, 10);
+        long lval;
+        if (strncmp("0b", param_inputs, 2) == 0) {
+            lval = strtol(&param_inputs[2], &p, 2);
+        } else {
+            lval = strtol(param_inputs, &p, 0);
+        }
+        // fprintf(stderr, "value conversion: %s to %ld\n", param_inputs, lval);
         if ((p == NULL) || (*p != '\0')) {
             fprintf(stderr, "Fatal: Error converting number\n");
             return EXIT_FAILURE;
@@ -823,106 +878,51 @@ int parse_command_audio_routing(const char *const param_sources)
             fprintf(stderr, "Fatal: Error converting number: too large\n");
             return EXIT_FAILURE;
         }
-
-        // printf("audio-routing lval=%ld\n", lval);
-        const uint8_t source_index = (uint8_t) lval;
-        COND_OR_RETURN(source_index < NOTEPAD_SOURCES_MAX,
-                       "sources index must be less than 4");
-
-        command_params_T params;
-        params.audio_routing.source_index = source_index;
-
-        run_command(commandfunc_audio_routing, &params);
-        return EXIT_SUCCESS;
-}
-
-
-static
-int parse_command_ducker_on(const char *const param_inputs,
-                            const char *const param_release_ms)
-    __attribute__(( nonnull(1), nonnull(2) ));
-
-static
-int parse_command_ducker_on(const char *const param_inputs,
-                            const char *const param_release)
-{
-        command_params_T params;
-
-        if (true) {
-            char *p = NULL;
-            errno = 0;
-            if (*(param_inputs) == '\0') {
-                fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
-                return EXIT_FAILURE;
-            }
-            long lval;
-            if (strncmp("0b", param_inputs, 2) == 0) {
-                lval = strtol(&param_inputs[2], &p, 2);
-            } else {
-                lval = strtol(param_inputs, &p, 0);
-            }
-            // fprintf(stderr, "value conversion: %s to %ld\n", param_inputs, lval);
-            if ((p == NULL) || (*p != '\0')) {
-                fprintf(stderr, "Fatal: Error converting number\n");
-                return EXIT_FAILURE;
-            }
-            if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
-                fprintf(stderr, "Fatal: Error converting number: number range\n");
-                return EXIT_FAILURE;
-            }
-            if (lval < 0) {
-                fprintf(stderr, "Fatal: Error converting number: negative\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > UINT8_MAX) {
-                fprintf(stderr, "Fatal: Error converting number: too large\n");
-                return EXIT_FAILURE;
-            }
-            /* range check input_set */
-            if (lval > 15) {
-                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
-                return EXIT_FAILURE;
-            }
-            params.ducker_on.inputs = (uint8_t) lval;
+        /* range check input_set */
+        if (lval > 15) {
+            fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+            return EXIT_FAILURE;
         }
+        params.ducker_on.inputs = (uint8_t) lval;
+    }
 
-        if (true) {
-            char *p = NULL;
-            errno = 0;
-            if (*(param_release) == '\0') {
-                fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
-                return EXIT_FAILURE;
-            }
-            const long lval = strtol(param_release, &p, 10);
-            if (p == NULL) {
-                fprintf(stderr, "Fatal: Error converting number\n");
-                return EXIT_FAILURE;
-            }
-            if (strcmp(p, "ms") != 0) {
-                fprintf(stderr, "Fatal: Missing unit (ms)\n");
-                return EXIT_FAILURE;
-            }
-            if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
-                fprintf(stderr, "Fatal: Error converting number: number range\n");
-                return EXIT_FAILURE;
-            }
-            if (lval < 0) {
-                fprintf(stderr, "Fatal: Error converting number: negative\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > UINT16_MAX) {
-                fprintf(stderr, "Fatal: Error converting number: too large\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > 5000L) {
-                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
-                return EXIT_FAILURE;
-            }
-            params.ducker_on.release_ms = (uint16_t) lval;
+    if (true) {
+        char *p = NULL;
+        errno = 0;
+        if (*(param_release) == '\0') {
+            fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+            return EXIT_FAILURE;
         }
+        const long lval = strtol(param_release, &p, 10);
+        if (p == NULL) {
+            fprintf(stderr, "Fatal: Error converting number\n");
+            return EXIT_FAILURE;
+        }
+        if (strcmp(p, "ms") != 0) {
+            fprintf(stderr, "Fatal: Missing unit (ms)\n");
+            return EXIT_FAILURE;
+        }
+        if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+            fprintf(stderr, "Fatal: Error converting number: number range\n");
+            return EXIT_FAILURE;
+        }
+        if (lval < 0) {
+            fprintf(stderr, "Fatal: Error converting number: negative\n");
+            return EXIT_FAILURE;
+        }
+        if (lval > UINT16_MAX) {
+            fprintf(stderr, "Fatal: Error converting number: too large\n");
+            return EXIT_FAILURE;
+        }
+        if (lval > 5000L) {
+            fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+            return EXIT_FAILURE;
+        }
+        params.ducker_on.release_ms = (uint16_t) lval;
+    }
 
-        run_command(commandfunc_ducker_on, &params);
-        return EXIT_SUCCESS;
+    run_command(commandfunc_ducker_on, &params);
+    return EXIT_SUCCESS;
 }
 
 
@@ -933,65 +933,65 @@ int parse_command_ducker_range(const char *const param_range)
 static
 int parse_command_ducker_range(const char *const param_range)
 {
-        command_params_T params;
+    command_params_T params;
 
-        char *p = NULL;
-        errno = 0;
-        if (*(param_range) == '\0') {
-            fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
-            return EXIT_FAILURE;
-        }
-        const long lval = strtol(param_range, &p, 0);
-        if (p == NULL) {
-            fprintf(stderr, "Fatal: Error converting number\n");
-            return EXIT_FAILURE;
-        }
-        if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
-            fprintf(stderr, "Fatal: Error converting number: number range\n");
-            return EXIT_FAILURE;
-        }
+    char *p = NULL;
+    errno = 0;
+    if (*(param_range) == '\0') {
+        fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+        return EXIT_FAILURE;
+    }
+    const long lval = strtol(param_range, &p, 0);
+    if (p == NULL) {
+        fprintf(stderr, "Fatal: Error converting number\n");
+        return EXIT_FAILURE;
+    }
+    if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+        fprintf(stderr, "Fatal: Error converting number: number range\n");
+        return EXIT_FAILURE;
+    }
 
-        if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
-            if (lval < 0) {
-                fprintf(stderr, "Fatal: Error converting number: negative\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > UINT32_MAX) {
-                fprintf(stderr, "Fatal: Error converting number: too large\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > 90) {
-                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
-                return EXIT_FAILURE;
-            }
-            /* value range is now 0 .. 90 including */
-            const double fmax   = 0x1fffffff;
-            const double fsteps = 90;
-            const double fval   = (double) lval;
-            const double frange = floor(fval * fmax / fsteps);
-            const uint32_t u32range = (uint32_t) frange;
-            params.ducker_range.range = u32range;
-        } else if (*p == '\0') { /* integer without a unit */
-            if (lval < 0) {
-                fprintf(stderr, "Fatal: Error converting number: negative\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > UINT32_MAX) {
-                fprintf(stderr, "Fatal: Error converting number: too large\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > 0x1fffffff) {
-                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
-                return EXIT_FAILURE;
-            }
-            params.ducker_range.range = (uint32_t) lval;
-        } else {
-            fprintf(stderr, "Fatal: Invalid unit (must be integer or integer with dB)\n");
+    if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
+        if (lval < 0) {
+            fprintf(stderr, "Fatal: Error converting number: negative\n");
             return EXIT_FAILURE;
         }
+        if (lval > UINT32_MAX) {
+            fprintf(stderr, "Fatal: Error converting number: too large\n");
+            return EXIT_FAILURE;
+        }
+        if (lval > 90) {
+            fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+            return EXIT_FAILURE;
+        }
+        /* value range is now 0 .. 90 including */
+        const double fmax   = 0x1fffffff;
+        const double fsteps = 90;
+        const double fval   = (double) lval;
+        const double frange = floor(fval * fmax / fsteps);
+        const uint32_t u32range = (uint32_t) frange;
+        params.ducker_range.range = u32range;
+    } else if (*p == '\0') { /* integer without a unit */
+        if (lval < 0) {
+            fprintf(stderr, "Fatal: Error converting number: negative\n");
+            return EXIT_FAILURE;
+        }
+        if (lval > UINT32_MAX) {
+            fprintf(stderr, "Fatal: Error converting number: too large\n");
+            return EXIT_FAILURE;
+        }
+        if (lval > 0x1fffffff) {
+            fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+            return EXIT_FAILURE;
+        }
+        params.ducker_range.range = (uint32_t) lval;
+    } else {
+        fprintf(stderr, "Fatal: Invalid unit (must be integer or integer with dB)\n");
+        return EXIT_FAILURE;
+    }
 
-        run_command(commandfunc_ducker_range, &params);
-        return EXIT_SUCCESS;
+    run_command(commandfunc_ducker_range, &params);
+    return EXIT_SUCCESS;
 }
 
 
@@ -1002,63 +1002,63 @@ int parse_command_ducker_threshold(const char *const param_threshold)
 static
 int parse_command_ducker_threshold(const char *const param_threshold)
 {
-        command_params_T params;
+    command_params_T params;
 
-        char *p = NULL;
-        errno = 0;
-        if (*(param_threshold) == '\0') {
-            fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+    char *p = NULL;
+    errno = 0;
+    if (*(param_threshold) == '\0') {
+        fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
+        return EXIT_FAILURE;
+    }
+    const long lval = strtol(param_threshold, &p, 0);
+    if (p == NULL) {
+        fprintf(stderr, "Fatal: Error converting number\n");
+        return EXIT_FAILURE;
+    }
+    if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
+        fprintf(stderr, "Fatal: Error converting number: number range\n");
+        return EXIT_FAILURE;
+    }
+
+    if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
+        if (lval < -60) {
+            fprintf(stderr, "Fatal: Error converting number: below -60dB\n");
             return EXIT_FAILURE;
         }
-        const long lval = strtol(param_threshold, &p, 0);
-        if (p == NULL) {
-            fprintf(stderr, "Fatal: Error converting number\n");
+        if (lval > 0) {
+            fprintf(stderr, "Fatal: Error converting number: above 0dB\n");
             return EXIT_FAILURE;
         }
-        if ((lval == LONG_MIN) || (lval == LONG_MAX)) {
-            fprintf(stderr, "Fatal: Error converting number: number range\n");
+        /* value range is now -60 .. 0 including */
+        const double fmax   = 0x7fffff;
+        const double fsteps = 60;
+        const double fval   = (double) (lval+60);
+        const double fthresh = floor(fval * fmax / fsteps);
+        const uint32_t u32thresh = (uint32_t) fthresh;
+
+        /* FIXME: thresh value 0x000000 basically means continually-ducked */
+        params.ducker_threshold.thresh = u32thresh;
+    } else if (*p == '\0') { /* integer without a unit */
+        if (lval < 0) {
+            fprintf(stderr, "Fatal: Error converting number: negative\n");
             return EXIT_FAILURE;
         }
-
-        if (strcmp(p, "dB") == 0) { /* integer ending with unit "dB" */
-            if (lval < -60) {
-                fprintf(stderr, "Fatal: Error converting number: below -60dB\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > 0) {
-                fprintf(stderr, "Fatal: Error converting number: above 0dB\n");
-                return EXIT_FAILURE;
-            }
-            /* value range is now -60 .. 0 including */
-            const double fmax   = 0x7fffff;
-            const double fsteps = 60;
-            const double fval   = (double) (lval+60);
-            const double fthresh = floor(fval * fmax / fsteps);
-            const uint32_t u32thresh = (uint32_t) fthresh;
-
-            /* FIXME: thresh value 0x000000 basically means continually-ducked */
-            params.ducker_threshold.thresh = u32thresh;
-        } else if (*p == '\0') { /* integer without a unit */
-            if (lval < 0) {
-                fprintf(stderr, "Fatal: Error converting number: negative\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > UINT32_MAX) {
-                fprintf(stderr, "Fatal: Error converting number: too large\n");
-                return EXIT_FAILURE;
-            }
-            if (lval > 0x1fffffff) {
-                fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
-                return EXIT_FAILURE;
-            }
-            params.ducker_threshold.thresh = (uint32_t) lval;
-        } else {
-            fprintf(stderr, "Fatal: Invalid unit (must be integer or integer with dB)\n");
+        if (lval > UINT32_MAX) {
+            fprintf(stderr, "Fatal: Error converting number: too large\n");
             return EXIT_FAILURE;
         }
+        if (lval > 0x1fffffff) {
+            fprintf(stderr, "Fatal: Error converting number: outside valid range\n");
+            return EXIT_FAILURE;
+        }
+        params.ducker_threshold.thresh = (uint32_t) lval;
+    } else {
+        fprintf(stderr, "Fatal: Invalid unit (must be integer or integer with dB)\n");
+        return EXIT_FAILURE;
+    }
 
-        run_command(commandfunc_ducker_threshold, &params);
-        return EXIT_SUCCESS;
+    run_command(commandfunc_ducker_threshold, &params);
+    return EXIT_SUCCESS;
 }
 
 
