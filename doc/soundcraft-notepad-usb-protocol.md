@@ -211,11 +211,12 @@ four channels which are available on the USB capture device:
 
 The Notepad-5 and Notepad-8FX have only two input channels on the USB
 audio capture device, so the number of input selection options for the
-ducker probably are two as well (TODO: verify input channels on
-Notepad-5 and Notepad-8FX):
+ducker probably are two as well:
 
     0b0001  1  INPUT 1
     0b0010  2  INPUT 2
+
+TODO: verify number of and encoding of input channels on NP-5, NP-8FX
 
 In any case, the behaviour of the ducker very much depends on the last
 `audio routing` command for the source of the signal to duck the USB
@@ -338,11 +339,13 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
                               continuously 0x00000000 while is ducker off
 
 To map the integer values to dB values, the following equation looks
-plausible (TODO: needs proper confirmation with the GUI):
+plausible:
 
                            /  meter_uint  \
     meter_dB = 20 * log10 |  ------------  |
                            \  0x01000000  /
+
+TODO: Need confirmation from GUI of meter range in uint32 and dB.
 
 With the inverse function mapping dB values to integer values being
 
