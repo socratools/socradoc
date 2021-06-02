@@ -8,8 +8,7 @@ AM_TESTS_ENVIRONMENT += LC_ALL='C'; export LC_ALL;
 
 # Some variables needed in test case scripts
 AM_TESTS_ENVIRONMENT += SCNP_CLI='$(abs_top_builddir)/scnp-cli'; export SCNP_CLI;
-AM_TESTS_ENVIRONMENT += LSUSB='$(LSUSB)'; export LSUSB;
-AM_TESTS_ENVIRONMENT += WC='$(WC)'; export WC;
+AM_TESTS_ENVIRONMENT += SCNP_CLI_DRY_RUN='yes'; export SCNP_CLI_DRY_RUN;
 
 
 # This might not work when cross-compiling.
@@ -45,17 +44,5 @@ EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_nothing.sh
 XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.sh
 
-# We have only this one test case which actually touches a physical
-# device, so that we do not run into difficulties when multiple tests
-# are run in parallel.
-#
-# As this test actually sets the hardware state, this sets it to the
-# default value of 3 - in the hope that this is the value the hardware
-# already had been set to.
-
 EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.sh
-if HAVE_LSUSB
-if HAVE_WC
 TESTS       += %reldir%/scnp-cli_audio-routing_3.sh
-endif
-endif

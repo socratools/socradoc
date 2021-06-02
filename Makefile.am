@@ -39,8 +39,6 @@ sed_commands =
 sed_commands += -e 's|[@]abs_top_builddir@|$(abs_top_builddir)|g'
 sed_commands += -e 's|[@]abs_top_srcdir@|$(abs_top_srcdir)|g'
 sed_commands += -e 's|[@]docdir@|$(docdir)|g'
-sed_commands += -e 's|[@]LSUSB@|$(LSUSB)|g'
-sed_commands += -e 's|[@]WC@|$(WC)|g'
 
 .shin.sh:
 	@$(MKDIR_P) $(@D)
