@@ -442,8 +442,8 @@ void usbdev_ducker_threshold(usbdev_T *usbdev,
     COND_OR_FAIL(thresh_value <= 0x007fffff,
                  "ducker threshold value outside of numeric range");
 
-    printf("ducker-threshold thresh=%u %s\n",
-           thresh_value, usbdev->notepad_device->name);
+    printf("ducker-threshold thresh=0x%x=%u %s\n",
+           thresh_value, thresh_value, usbdev->notepad_device->name);
 
     uint8_t data[8];
     data[0] = 0x00;
