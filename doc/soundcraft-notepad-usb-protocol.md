@@ -176,18 +176,32 @@ CONTROL OUT message with endpoint 0 setting the "Duck range":
 To map the integer values to dB values, the following equation looks
 plausible:
 
-                           /  uint_value  \
-    dB_value = 20 * log10 |  ------------  |
-                           \  0x20000000  /
+                             /  range_uint  \
+    range_dB = - 20 * log10 |  ------------  |
+                             \  0x1fffffff  /
 
 With the inverse function mapping dB values to integer values being
 
-                                 / dB_value \
-                                | ---------- |
-                                 \    20    /
-    uint_value = 0x20000000 * 10
+                                 /  -range_dB  \
+                                |  -----------  |
+                                 \      20     /
+    range_uint = 0x1fffffff * 10
 
 TODO: What is a reasonable dB range value a GUI could start with?
+
+### value table for duck range ###
+
+    __dB__  _uint32_t_  _uint32_t_
+       0dB  0x1fffffff   536870911
+      10dB  0x0a1e89b1   169773489
+      20dB  0x03333333    53687091
+      30dB  0x01030dc5    16977349
+      40dB  0x0051eb85     5368709
+      50dB  0x0019e7c7     1697735
+      60dB  0x00083127      536871
+      70dB  0x0002972d      169773
+      80dB  0x0000d1b7       53687
+      90dB  0x00004251       16977
 
 
 ducker-threshold command
@@ -204,18 +218,29 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
 To map the integer values to dB values, the following equation looks
 plausible:
 
-                           /  uint_value  \
-    dB_value = 20 * log10 |  ------------  |
-                           \   0x800000   /
+                            /  thresh_uint  \
+    thresh_dB = 20 * log10 |  -------------  |
+                            \   0x007fffff  /
 
 With the inverse function mapping dB values to integer values being
 
-                                 / dB_value \
-                                | ---------- |
-                                 \    20    /
-    uint_value = 0x800000 * 10
+                                 /  thresh_dB  \
+                                |  -----------  |
+                                 \      20     /
+    thresh_uint = 0x007fffff * 10
 
 TODO: What is a reasonable dB threshold value a GUI could start with?
+
+### value table for ducker threshold ###
+
+    __dB__  _uint32_t_  _uint32_t_
+     -60dB  0x000020c5        8389
+     -50dB  0x0000679f       26527
+     -40dB  0x000147ae       83886
+     -30dB  0x00040c37      265271
+     -20dB  0x000ccccd      838861
+     -10dB  0x00287a26     2652710
+       0dB  0x007fffff     8388607
 
 
 meter
@@ -243,10 +268,32 @@ value:
 To map the integer values to dB values, the following equation looks
 plausible:
 
-                           /  uint_value  \
-    dB_value = 20 * log10 |  ------------  |
+                           /  meter_uint  \
+    meter_dB = 20 * log10 |  ------------  |
                            \  0x01000000  /
+
+With the inverse function mapping dB values to integer values being
+
+                                 /  meter_dB  \
+                                |  ----------  |
+                                 \     20     /
+    meter_uint = 0x01000000 * 10
 
 For an integer range of 0x8e .. 0x010007bd, this corresponds to
 -101.449dB .. 0.001dB, so some value clamping to the interval -100.0dB
 .. 0.0dB appears to be in order.
+
+### value table for ducker meter ###
+
+    __dB__  _uint32_t_  _uint32_t_
+    -100dB  0x000000a8         168
+     -90dB  0x00000213         531
+     -80dB  0x0000068e        1678
+     -70dB  0x000014b9        5305
+     -60dB  0x00004189       16777
+     -50dB  0x0000cf3e       53054
+     -40dB  0x00028f5c      167772
+     -30dB  0x0008186e      530542
+     -20dB  0x0019999a     1677722
+     -10dB  0x0050f44e     5305422
+       0dB  0x01000000    16777216
