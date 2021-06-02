@@ -84,7 +84,7 @@ uint32_t dry_run_value = 0x00001000;
     } while (0)
 
 
-#define SOURCES_MAX 4
+#define NOTEPAD_SOURCES_MAX 4
 
 
 /* We do not care about padding and storage efficiency here */
@@ -93,7 +93,7 @@ typedef struct {
     const char *const name;
     bool ducker;
     const char *const source_descr;
-    const char *const sources[SOURCES_MAX];
+    const char *const sources[NOTEPAD_SOURCES_MAX];
 } notepad_device_T;
 
 
@@ -757,7 +757,7 @@ void print_usage(const char *const prog)
     for (int i=0; supported_devices[i].idProduct != 0; ++i) {
         printf("               %s %s\n",
                supported_devices[i].name, supported_devices[i].source_descr);
-        for (int k=0; k<SOURCES_MAX; k++) {
+        for (int k=0; k<NOTEPAD_SOURCES_MAX; k++) {
             printf("                 %d  %s\n",
                    k, supported_devices[i].sources[k]);
         }
@@ -869,7 +869,7 @@ int parse_cmdline(const int argc, const char *const argv[])
 
         // printf("audio-routing lval=%ld\n", lval);
         const uint8_t source_index = (uint8_t) lval;
-        COND_OR_RETURN(source_index < SOURCES_MAX,
+        COND_OR_RETURN(source_index < NOTEPAD_SOURCES_MAX,
                        "sources index must be less than 4");
 
         command_params_T params;
