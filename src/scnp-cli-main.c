@@ -178,7 +178,6 @@ double uint_to_dB_meter(const uint32_t uint_value)
 typedef struct {
     uint16_t idProduct;
     const char *const name;
-    bool ducker;
     const char *const source_descr;
     const char *const sources[NOTEPAD_SOURCES_MAX];
 } notepad_device_T;
@@ -188,19 +187,16 @@ static
 const notepad_device_T supported_devices[] = {
     { 0x0030,
       "NOTEPAD-5",
-      false, /* no ducker */
       "channels 1+2 of 2-channel audio capture device",
       {"MIC+LINE 1+2", "LINE 2+3", "LINE 4+5", "MASTER L+R"}},
 
     { 0x0031,
       "NOTEPAD-8FX",
-      false, /* no ducker... but REALLY? */
       "channels 1+2 of 2-channel audio capture device",
       {"MIC 1+2", "LINE 3+4", "LINE 5+6", "MASTER L+R"}},
 
     { 0x0032,
       "NOTEPAD-12FX",
-      true, /* supports ducker */
       "channels 3+4 of 4-channel audio capture device",
       {"MIC 3+4", "LINE 5+6", "LINE 7+8", "MASTER L+R"}},
 
@@ -657,10 +653,6 @@ static
 void commandfunc_ducker_off(usbdev_T *usbdev,
                             command_params_T *params __attribute__(( unused )) )
 {
-    /* TODO: Move this check to device list generation code */
-    COND_OR_FAIL(usbdev->notepad_device->ducker,
-                 "device does not support ducker");
-
     usbdev_ducker_off(usbdev);
 }
 
@@ -669,10 +661,6 @@ static
 void commandfunc_ducker_on(usbdev_T *usbdev,
                            command_params_T *params)
 {
-    /* TODO: Move this check to device list generation code */
-    COND_OR_FAIL(usbdev->notepad_device->ducker,
-                 "device does not support ducker");
-
     usbdev_ducker_on(usbdev,
                      params->ducker_on.inputs,
                      params->ducker_on.release_ms);
@@ -683,10 +671,6 @@ static
 void commandfunc_ducker_range(usbdev_T *usbdev,
                               command_params_T *params)
 {
-    /* TODO: Move this check to device list generation code */
-    COND_OR_FAIL(usbdev->notepad_device->ducker,
-                 "device does not support ducker");
-
     usbdev_ducker_range(usbdev,
                         params->ducker_range.range);
 }
@@ -696,9 +680,6 @@ static
 void commandfunc_ducker_threshold(usbdev_T *usbdev,
                                   command_params_T *params)
 {
-    /* TODO: Move this check to device list generation code */
-    COND_OR_FAIL(usbdev->notepad_device->ducker, "device does not support ducker");
-
     usbdev_ducker_threshold(usbdev,
                             params->ducker_threshold.thresh);
 }
@@ -713,10 +694,6 @@ static
 void commandfunc_meter(usbdev_T *usbdev,
                        command_params_T *params __attribute__(( unused )) )
 {
-    /* TODO: Move this check to device list generation code */
-    COND_OR_FAIL(usbdev->notepad_device->ducker,
-                 "device does not support ducker");
-
     usbdev_meter(usbdev);
 }
 
