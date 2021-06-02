@@ -4,9 +4,6 @@
 
 check_PROGRAMS += scnp-cli
 
-EXTRA_DIST     += scnp-cli-ALL_COMMANDS.shin
-CLEANFILES     += scnp-cli-ALL_COMMANDS.sh
-noinst_SCRIPTS += scnp-cli-ALL_COMMANDS.sh
 
 EXTRA_DIST  += %reldir%/scnp-cli--help.shin
 CLEANFILES  += %reldir%/scnp-cli--help.sh
