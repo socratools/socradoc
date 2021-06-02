@@ -26,6 +26,7 @@
 
 
 #include <errno.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <math.h>
 #include <stdbool.h>
@@ -39,6 +40,14 @@
 
 
 #include "auto-config.h"
+
+
+static
+bool dry_run = false;
+
+
+static
+uint32_t dry_run_value = 0x00001000;
 
 
 #define COND_OR_FAIL(COND, MSG)                                       \
@@ -235,22 +244,36 @@ void device_recv_ctrl_message(libusb_device_handle *device_handle,
 
     COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
 
-    const int luret_ctrl_transfer =
-        libusb_control_transfer(device_handle,
-                                0xc0 /* bmRequestType */,
-                                16 /* bRequest */,
-                                0 /* wValue */,
-                                0 /* wIndex */,
-                                data, u16_data_size,
-                                10000 /* timeout in ms */);
-    LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
-    COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
-                 "libusb_control_transfer");
+    if (dry_run) {
+        data[0] = (dry_run_value >>  0) & 0xff;
+        data[1] = (dry_run_value >>  8) & 0xff;
+        data[2] = (dry_run_value >> 16) & 0xff;
+        data[3] = (dry_run_value >> 24) & 0xff;
+        data[4] = 0x00;
+        data[5] = 0x00;
+        data[6] = 0x00;
+        data[7] = 0x00;
+        return;
+    } else {
+        const int luret_ctrl_transfer =
+            libusb_control_transfer(device_handle,
+                                    0xc0 /* bmRequestType */,
+                                    16 /* bRequest */,
+                                    0 /* wValue */,
+                                    0 /* wIndex */,
+                                    data, u16_data_size,
+                                    10000 /* timeout in ms */);
+        LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
+        COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
+                     "libusb_control_transfer");
+    }
 
 #if 0
-    printf("device_recv_ctrl_message got {%02x %02x %02x %02x %02x %02x %02x %02x}\n",
+    printf("device_recv_ctrl_message got"
+           " {%02x %02x %02x %02x %02x %02x %02x %02x}%s\n",
            data[0], data[1], data[2], data[3],
-           data[4], data[5], data[6], data[7]);
+           data[4], data[5], data[6], data[7],
+           dry_run?" (dry-run)":"");
 #endif
 }
 
@@ -268,9 +291,15 @@ void device_send_ctrl_message(libusb_device_handle *device_handle,
     const uint16_t u16_data_size = (uint16_t) data_size;
 
     COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
-    printf("device_send_ctrl_message(device, {%02x %02x %02x %02x %02x %02x %02x %02x})\n",
+    printf("device_send_ctrl_message(device,"
+           " {%02x %02x %02x %02x %02x %02x %02x %02x})%s\n",
            data[0], data[1], data[2], data[3],
-           data[4], data[5], data[6], data[7]);
+           data[4], data[5], data[6], data[7],
+           dry_run?" (dry-run)":"");
+
+    if (dry_run) {
+        return;
+    }
 
     const int luret_ctrl_transfer =
         libusb_control_transfer(device_handle,
@@ -1065,5 +1094,18 @@ int parse_cmdline(const int argc, const char *const argv[])
 
 int main(const int argc, const char *const argv[])
 {
+    const char *const env_scnp_cli_dry_run = getenv("SCNP_CLI_DRY_RUN");
+    if (env_scnp_cli_dry_run && (*env_scnp_cli_dry_run != '\0')) {
+        dry_run = true;
+
+        char *endp = NULL;
+        const uintmax_t uim = strtoumax(env_scnp_cli_dry_run, &endp, 0);
+        if ((endp != NULL) && (endp != env_scnp_cli_dry_run) && (*endp == '\0')) {
+            if (uim != UINTMAX_MAX) {
+                dry_run_value = (uint32_t) uim;
+            }
+        }
+    }
+
     return parse_cmdline(argc, argv);
 }

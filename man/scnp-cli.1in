@@ -113,6 +113,13 @@ Any non\-0 exit code means that \fBscnp\-cli\fR has encountered an error and has
 .\"
 .\" ====================================================================
 .\"
+.SH ENVIRONMENT
+.TP
+.B SCNP_CLI_DRY_RUN
+If the SCNP_CLI_DRY_RUN environment variable is set to to a non\-empty value, then \fBscnp\-cli\fR will refrain from actually executing any USB control transfers to or from any USB device.  Whether and how \fBscnp\-cli\fR interprets that non\-empty string in any way is unspecified at this time.
+.\"
+.\" ====================================================================
+.\"
 .SH NOTES
 .SS "Devices and Permissions"
 .PP
