@@ -1,16 +1,48 @@
 The Soundcraft Notepad USB protocol
 ===================================
 
-This document describes the USB protocol spoken between the
-"Soundcraft USB audio control panel" and a Soundcraft Notepad mixer
-and the mixer state that protocol communicates about.
+This document describes Soundcraft's Notepad series of mixers and how
+the USB protocol the **Soundcraft USB audio control panel** and the
+Soundcraft Notepad series mixer appears to work together.
+
+The information in this document is a summery of what could be
+observed, and makes no guarantees whatsoever regarding
+
+  * accuracy
+  * applicability
+  * usefulness
+  * validity
+
+USE the information from this document AT YOUR OWN RISK.
+
+The Notepad series of mixers comprises the following three models:
+
+  * Notepad-5    (2/2 USB class compliant audio device, no FX unit)
+  * Notepad-8FX  (2/2 USB class compliant audio device)
+  * Notepad-12FX (4/4 USB class compliant audio device)
+
+Configurable audio routing appears to have been a device feature from
+the start, as it already is described in the 1.0 version of the
+manual.
+
+According to a Soundcraft press release from Harman Professional from
+January 24, 2018, the 1.09 firmware version has introduced the Ducker
+feature for all three devices in the Notepad series.
+
+Soundcraft provides the **Soundcraft USB audio control panel** which
+allows changing the mixer settings for audio routing and the
+ducker. However, that software is only available in binary form for
+Windows and MacOS X, and the documentation provided by Soundcraft
+provides no description of the USB protocol the **Soundcraft USB audio
+control panel** uses to communicate with the mixer devices.
 
 
 General packet format
 =====================
 
-The observed USB control OUT request packets all have these
-properties:
+Changing the mixer settings works by the USB host sending a 8 byte USB
+control OUT request packet to the mixer's endpoint 0.  The control
+requests we have observed all have the following properties:
 
     USB Control OUT transfer with
          0x40  bmRequestType
@@ -18,18 +50,28 @@ properties:
          0     wValue
          0     wIndex
 
-    8 byte command data buffer
+    sends 8 byte command data buffer
 
-There are other USB requests in use, e.g. for getting the meter
-value in the vendor GUI's "Ducking" tab.
+To receive the meter value, a very similar USB Control IN transfer is
+used to receive 8 bytes of data:
+
+    USB Control IN transfer with
+         0xc0  bmRequestType
+         16    bRequest
+         0     wValue
+         0     wIndex
+
+    receives 8 byte of data buffer
+
+Caution: While most of the multi byte values in the data buffer are
+         big endian, but some are little endian.
 
 
 Mixer state vs host software state
 ==================================
 
-The MacOS "Soundcraft USB audio control panel" does not appear to
-query any information from the mixer when the Mac is up and running in
-normal operation.
+We have not observed the **Soundcraft USB audio control panel** query
+any information from the mixer.
 
 On starting the "Soundcraft USB audio control panel", no USB requests
 can be observed which query the mixer state. However, the "Soundcraft
@@ -43,135 +85,161 @@ When the mixer state is changed via USB commands, such as
   * enabled ducking
   * enabled ducking with weird specific range and threshold values
 
-and the mixer is power cycled, the audio routing is back to the "Mix
-L+R" default, ducking is off, and if you then re-enable ducking, the
-range and threshold appear set to reasonable default values.  This
-suggests that the mixer has no nonvolatile storage for any state.
+and the mixer is power cycled, the mixer sets its state to reasonable
+default values: audio routing is set to "Mix L+R", and ducking is off.
 
-The question is still open, though, about whether there might be a
-"query state" USB command for when a continuously powered mixer is
-plugged into and unplugged from a computer repeatedly.
+If you then re-enable ducking with `ducker on/off` command, the range
+and threshold appear to have been reset to reasonable default values.
+
+This behaviour suggests that the mixer has no persistent storage for
+any state. (Avoiding persistent state in the mixer device also makes
+sense from device design, user experience, and user support
+perspectives.)
+
+There might still be a few "quere mixer state" USB command implemented
+in the mixer, but we have not observed their use yet.
 
 
 Audio Routing
 =============
 
-The "Audio Routing" tab of the MacOS control panel allows us to select
-any one of four different options for the audio input.
+On all three devices in the Notepad series, you can change the audio
+channels the mixer delivers as the USB capture device using the `audio
+routing` command.
 
 
-audio-routing command
----------------------
+`audio routing` command
+-----------------------
+
+Using the `audio routing` command, you can select which of the mixer's
+audio channel are routed to the USB capture device.
+
+On the 2/2 channel USB capture devices Notepad-5 and Notepad-8FX, the
+two selected channels go to the two channels of the USB capture
+device. On the 4/4 channel USB capture device Notepad-12FX, you can
+select the two mixer channels going to USB capture device channels
+3+4, but the USB capture device channels 1+2 are always fixed to
+MIC 1 + MIC 2.
 
     00 00 04 00 00 00 00 00
-                ┗┩
-                 └─────────── source index (range 0..3)
+          ┗┩    ┗┩
+           │     └─────────── index into source table (range 0x00..0x03)
+           └───────────────── 0x04 = audio routing command
 
-The table of audio routing options for the Notepad-5:
+    The unlabled bytes have always been observed to be 0x00.
+
+Table of possible audio sources for the Notepad-5:
 
     index     device label     description from the manual
     0         MIC 1 + LINE 2   Mic Input 1 + Mono line input 2
-    1         LINE 5+6         Stereo Input 2+3
-    2         LINE 7+8         Stereo Input 4+5
+    1         LINE 2/3         Stereo Input 2+3
+    2         LINE 4/5         Stereo Input 4+5
     3         MASTER L+R       Mix L+R
 
-The table of audio routing options for the Notepad-8FX:
+Table of possible audio sources for the Notepad-8FX:
 
     index     device label     descriptions from the manual
     0         MIC 1+2          Mic inputs 1+2
-    1         LINE 3+4         Stereo input 3+4
-    2         LINE 5+6         Stereo input 5+6
+    1         LINE 3/4         Stereo input 3+4
+    2         LINE 5/6         Stereo input 5+6
     3         MASTER L+R       Mix L+R
 
-Table for Notepad-12FX sources:
+Table of possible audio sources for the Notepad-12FX:
 
     index     device label     descriptions from the manual
     0         MIC 3+4          Mic input 3+4
-    1         LINE 5+6         Stereo input 5+6
-    2         LINE 7+8         Stereo input 7+8
+    1         LINE 5/6         Stereo input 5+6
+    2         LINE 7/8         Stereo input 7+8
     3         MASTER L+R       Mix L+R
 
-The audio routing command been tested to work with `scnp-cli` for the
-Notepad-12FX, and with `soundcraft-utils` for Notepad-5,
+The `audio routing` command been tested to work with `scnp-cli` for
+the Notepad-12FX, and with `soundcraft-utils` for Notepad-5,
 Notepad-8FX. and Notepad-12FX.
 
 
 Ducker
 ======
 
-The Notepad-12FX has a ducker feature which can duck USB playback
+The Notepad's ducker feature can duck the signal from the USB playback
 channels 1+2 (on the Notepad-12FX four channel USB playback device,
 USB playback channels 3+4 are not ducked) when it detects a signal on
-any combination of the four channels going to the USB audio capture
-device.
-
-TODO: What about the 8FX with its two MIC channels and two channel
-      Audio capture? What about the Notepad-5 with its single MIC
-      channel, two channel Audio interface and no FX engine?
-      Screenshots from the Windows/MacOS vendor software with one of
-      those devices connected might be helpful here, even without
-      packet dumps.
+any combination of the so-called "input" channels which are the
+channels withc are going to the USB audio capture device.
 
 The ducker is not mentioned at all in the user manual for the Notepad
 series of mixers, but it can be turned on and off and its parameters
 tuned in the "Ducker" tab of Soundcraft's MacOS (and presumably
-Windows) software.
+Windows) software for the Notepad series.
 
-Note: The ducker information is still preliminary, and needs testing,
-      especially on devices other than a Notepad-12FX, if those other
-      devices even support the ducker feature.
+As the **Soundcraft USB audio control panel** only sends USB requests
+changing the settings of the ducker while the ducker is actually
+enabled, it appears be prudent to do the same in any software
+implementing commands to Notepad series mixers.
 
-The following command (`play` is part of the sox sound file conversion
-tool) can be helpful for testing the ducker:
+All ducker related commands appear to use the following format:
 
-    play -n synth whitenoise
-
-As the MacOS GUI only sends USB requests changing the settings of the
-ducker while the ducker is actually enabled both in the GUI and on the
-mixer, it might be prudent to do the same in other software
-implementations.
+    00 00 02 cc xx xx xx xx
+          ┗┩ ┗┩ ┗━━━━━━━━━┩
+           │  │           └── command specific parameters
+           │  └────────────── ducker command (0x80, 0x81, 0x82)
+           └───────────────── 0x02 = ducker related command
 
 
-ducker-off and ducker-on command
---------------------------------
+`ducker on/off` command
+-----------------------
 
-CONTROL OUT message setting the "release" time, enabling/disabling the
-ducker and configuring the set of inputs for the ducker, all at the
-same time:
+The `ducker on/off` command not only enables/disables the ducker, but
+it also configures the set of "input" channels the ducker is to
+observe, and the ducker's release time:
 
     00 00 02 80 01 01 0c 15
-                ┗┩ ┗┩ ┗━━━┩
-                 │  │     └── network endian release value in ms
-                 │  │         (observed range is 0..5000)
-                 │  └──────── bits[3..0] are INPUT[4..1] enable bitfield
-                 └─────────── 0x01 = enable ducker, 0x00 disable ducker
+          ┗┩ ┗┩ ┗┩ ┗┩ ┗━━━┩
+           │  │  │  │     └── release value in ms (network endian)
+           │  │  │  │         (observed range is 0..5000)
+           │  │  │  └──────── bits[3..0] are INPUT[4..1] enable bitfield
+           │  │  └─────────── 0x01 = enable ducker, 0x00 disable ducker
+           │  └────────────── 0x80 = ducker on/off command
+           └───────────────── 0x02 = ducker related command
 
-The four (in the case of the Notepad-12FX) inputs we can select from
-are the same four channels of the USB audio capture device.
+On the Notepad-12FX, the four inputs we can select from are the same
+four channels which are available on the USB capture device:
 
-    0001  1  INPUT 1
-    0010  2  INPUT 2
-    0100  4  INPUT 3
-    1000  8  INPUT 4
+    0b0001  1  INPUT 1
+    0b0010  2  INPUT 2
+    0b0100  4  INPUT 3
+    0b1000  8  INPUT 4
 
-This means that the ducker behaviour of the mixer depends on the last
-"Audio Routing" command. And there is a curiously weird edge case
-here: When the Audio Routing is set to 3 (Mix L+R), the USB output
-channel 1+2 signal is mixed into MIX L+R, and thus ducks itself!
+The Notepad-5 and Notepad-8FX have only two input channels on the USB
+audio capture device, so the number of input selection options for the
+ducker probably are two as well (TODO: verify input channels on
+Notepad-5 and Notepad-8FX):
+
+    0b0001  1  INPUT 1
+    0b0010  2  INPUT 2
+
+In any case, the behaviour of the ducker very much depends on the last
+`audio routing` command for the source of the signal to duck the USB
+playback for.
+
+There is a curiously weird edge case to be found here: When the audio
+routing is set to 3 (MIX L+R), and the USB output channel 1+2 signal
+is mixed into MIX L+R, the USB playback signal ducks itself!
 
 TODO: What is a reasonable ms release value a GUI could start with?
 
 
-ducker-range command
---------------------
+`ducker range` command
+----------------------
 
-CONTROL OUT message with endpoint 0 setting the "Duck range":
+CONTROL OUT message with endpoint 0 setting the "duck range":
 
     00 00 02 81 00 00 4a 67
-                ┗━━━━━━━━━┩
-                          └── network endian "duck range" value
-                              observed range is 0x1fff_ffff to 0x0000_4a67
-                              corresponding to displayed values of 0dB to 90dB
+          ┗┩ ┗┩     ┗━━━━━━━━━┩
+           │  │           └── network endian "duck range" value
+           │  │               observed range is 0x1fff_ffff to 0x0000_4a67
+           │  │               corresponding to displayed values of 0dB to 90dB
+           │  └────────────── 0x81 = ducker range command
+           └───────────────── 0x02 = ducker related command
 
 To map the integer values to dB values, the following equation looks
 plausible:
@@ -189,7 +257,7 @@ With the inverse function mapping dB values to integer values being
 
 TODO: What is a reasonable dB range value a GUI could start with?
 
-### value table for duck range ###
+### calculated value table for duck range ###
 
     __dB__  _uint32_t_  _uint32_t_
        0dB  0x1fffffff   536870911
@@ -204,16 +272,18 @@ TODO: What is a reasonable dB range value a GUI could start with?
       90dB  0x00004251       16977
 
 
-ducker-threshold command
-------------------------
+`ducker threshold` command
+--------------------------
 
 CONTROL OUT message with endpoint 0 setting the "threshold":
 
     00 00 02 82 00 7f ff ff
-                ┗━━━━━━━━━┩
-                          └── network endian threshold value
-                              observed range is 0x20c3=8387 to 0x7fffff=8388607
-                              corresponding to displayed values of -60dB to 0dB
+          ┗┩ ┗┩ ┗━━━━━━━━━┩
+           │  │           └── network endian threshold value
+           │  │               observed range is 0x20c3=8387 to 0x7fffff=8388607
+           │  │               corresponding to displayed values of -60dB to 0dB
+           │  └────────────── 0x82 = ducker threshold command
+           └───────────────── 0x02 = ducker related command
 
 To map the integer values to dB values, the following equation looks
 plausible:
@@ -231,7 +301,7 @@ With the inverse function mapping dB values to integer values being
 
 TODO: What is a reasonable dB threshold value a GUI could start with?
 
-### value table for ducker threshold ###
+### calculated value table for ducker threshold ###
 
     __dB__  _uint32_t_  _uint32_t_
      -60dB  0x000020c5        8389
@@ -243,12 +313,13 @@ TODO: What is a reasonable dB threshold value a GUI could start with?
        0dB  0x007fffff     8388607
 
 
-meter
------
+`ducker meter` query
+------------------
 
-It appears that the vendor software just issues a USB Ctrl IN Request
-every 0.05s where the 8 byte reply buffer then contains the meter
-value:
+It appears that to show the meter bar graph in the GUI, the
+**Soundcraft USB audio control panel** just issues a USB Ctrl IN
+Request every 0.05s where the 8 byte reply buffer then contains the
+meter value:
 
     USB Control IN transfer with
          0xc0  bmRequestType
@@ -256,17 +327,18 @@ value:
          0     wValue
          0     wIndex
 
-Weirdly enough, the reply data appear to contain a LITTLE ENDIAN 32bit
-value:
+Weirdly enough, the reply data is the only place in the Notepad USB
+protocol which uses a multibyte value in LITTLE ENDIAN.
 
     bd 07 00 01 00 00 00 00
-    ┗━━━━━━━━━┩
+    ┗━━━━━━━━━┩ ┗━━━━━━━━━┩
+              │           └── always observed full of 0x00
               └────────────── meter value in LITTLE ENDIAN!
                               observed range: 0x0000008e .. 0x010007bd
                               continuously 0x00000000 while is ducker off
 
 To map the integer values to dB values, the following equation looks
-plausible:
+plausible (TODO: needs proper confirmation with the GUI):
 
                            /  meter_uint  \
     meter_dB = 20 * log10 |  ------------  |
@@ -279,11 +351,25 @@ With the inverse function mapping dB values to integer values being
                                  \     20     /
     meter_uint = 0x01000000 * 10
 
-For an integer range of 0x8e .. 0x010007bd, this corresponds to
--101.449dB .. 0.001dB, so some value clamping to the interval -100.0dB
-.. 0.0dB appears to be in order.
+For an integer range of `0x8e` .. `0x010007bd`, this corresponds to
+`-101.449dB` .. `0.001dB`, so some value clamping to the interval
+`-100.0dB` .. `0.0dB` appears to be in order.
 
-### value table for ducker meter ###
+While it is clear that the integer values do not significantly exceed
+the dB range from `-100dB` to `0dB`, it *is* clear that it *does*, so
+care needs to be taken to clamp the values to the applicable interval
+of numbers.
+
+Note that the meter feature only works while the ducker is enabled. If
+the ducker is *not* enabled, all meter responses will be all-0x00, so
+you will receive a `0x00000000` value for meter_uint which means the
+dB conversion function will compute the logarithm of `0` which will
+either compute as negative infinity, throw an exception, or similar.
+
+So the rule to only issue ducker related commands while the ducker is
+actually enabled definitively applies here.
+
+### calculated value table for ducker meter ###
 
     __dB__  _uint32_t_  _uint32_t_
     -100dB  0x000000a8         168
@@ -297,3 +383,7 @@ For an integer range of 0x8e .. 0x010007bd, this corresponds to
      -20dB  0x0019999a     1677722
      -10dB  0x0050f44e     5305422
        0dB  0x01000000    16777216
+
+Caution: We have observed meter_uint values **outside** the range
+         given by this table, such as e.g. `0x010007bd` corresponding to
+         `0.001dB`.
