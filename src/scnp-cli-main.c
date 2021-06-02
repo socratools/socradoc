@@ -794,62 +794,19 @@ void print_usage(const char *const prog)
 
 
 static
-const char *arg0_to_prog(const char *const arg0);
+int parse_command_audio_routing(const char *const param_sources)
+    __attribute__(( nonnull(1) ));
 
 static
-const char *arg0_to_prog(const char *const arg0)
+int parse_command_audio_routing(const char *const param_sources)
 {
-    const char *const last_slash = strrchr(arg0, '/');
-    const char *const after_last_slash = last_slash?(last_slash+1):arg0;
-    const char *const prog =
-        (*after_last_slash == '\0')?arg0:after_last_slash;
-
-#if 0
-    fprintf(stderr, "argv[0] %s\n", arg0);
-    fprintf(stderr, "last_slash %s\n", last_slash);
-    fprintf(stderr, "after_last_slash %s\n", after_last_slash);
-    fprintf(stderr, "prog %s\n", prog);
-#endif
-
-    return prog;
-}
-
-
-static
-int parse_cmdline(const int argc, const char *const argv[]);
-
-static
-int parse_cmdline(const int argc, const char *const argv[])
-{
-#if 0
-    for (int i=0; i<argc; i++) {
-        printf("%3d. %s\n", i, argv[i]);
-    }
-#endif
-
-    COND_OR_RETURN(argc > 0, "program invocations without arg0?!");
-
-    const char *const prog = arg0_to_prog(argv[0]);
-
-    COND_OR_RETURN(argc >= 2, "too few command line arguments");
-    COND_OR_RETURN(argc <= 4, "too many command line arguments");
-
-    if (false) {
-        /* nothing */
-    } else if ((argc == 2) && (strcmp(argv[1], "--help") == 0)) {
-        print_usage(prog);
-        return EXIT_SUCCESS;
-    } else if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
-        print_version(prog);
-        return EXIT_SUCCESS;
-    } else if ((argc == 3) && (strcmp(argv[1], "audio-routing") == 0)) {
         char *p = NULL;
         errno = 0;
-        if (*(argv[2]) == '\0') {
+        if (*(param_sources) == '\0') {
             fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
             return EXIT_FAILURE;
         }
-        const long lval = strtol(argv[2], &p, 10);
+        const long lval = strtol(param_sources, &p, 10);
         if ((p == NULL) || (*p != '\0')) {
             fprintf(stderr, "Fatal: Error converting number\n");
             return EXIT_FAILURE;
@@ -877,35 +834,34 @@ int parse_cmdline(const int argc, const char *const argv[])
 
         run_command(commandfunc_audio_routing, &params);
         return EXIT_SUCCESS;
-    } else if ((argc == 2) && (strcmp(argv[1], "meter") == 0)) {
-        command_params_T params;
-        /* no params needed to run the meter */
+}
 
-        run_command(commandfunc_meter, &params);
-        return EXIT_SUCCESS;
-    } else if ((argc == 2) && (strcmp(argv[1], "ducker-off") == 0)) {
-        command_params_T params;
-        /* no params needed to turn off ducker  */
 
-        run_command(commandfunc_ducker_off, &params);
-        return EXIT_SUCCESS;
-    } else if ((argc == 4) && (strcmp(argv[1], "ducker-on") == 0)) {
+static
+int parse_command_ducker_on(const char *const param_inputs,
+                            const char *const param_release_ms)
+    __attribute__(( nonnull(1), nonnull(2) ));
+
+static
+int parse_command_ducker_on(const char *const param_inputs,
+                            const char *const param_release)
+{
         command_params_T params;
 
         if (true) {
             char *p = NULL;
             errno = 0;
-            if (*(argv[2]) == '\0') {
+            if (*(param_inputs) == '\0') {
                 fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
                 return EXIT_FAILURE;
             }
             long lval;
-            if (strncmp("0b", argv[2], 2) == 0) {
-                lval = strtol(&argv[2][2], &p, 2);
+            if (strncmp("0b", param_inputs, 2) == 0) {
+                lval = strtol(&param_inputs[2], &p, 2);
             } else {
-                lval = strtol(argv[2], &p, 0);
+                lval = strtol(param_inputs, &p, 0);
             }
-            // fprintf(stderr, "value conversion: %s to %ld\n", argv[2], lval);
+            // fprintf(stderr, "value conversion: %s to %ld\n", param_inputs, lval);
             if ((p == NULL) || (*p != '\0')) {
                 fprintf(stderr, "Fatal: Error converting number\n");
                 return EXIT_FAILURE;
@@ -933,11 +889,11 @@ int parse_cmdline(const int argc, const char *const argv[])
         if (true) {
             char *p = NULL;
             errno = 0;
-            if (*(argv[3]) == '\0') {
+            if (*(param_release) == '\0') {
                 fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
                 return EXIT_FAILURE;
             }
-            const long lval = strtol(argv[3], &p, 10);
+            const long lval = strtol(param_release, &p, 10);
             if (p == NULL) {
                 fprintf(stderr, "Fatal: Error converting number\n");
                 return EXIT_FAILURE;
@@ -967,16 +923,25 @@ int parse_cmdline(const int argc, const char *const argv[])
 
         run_command(commandfunc_ducker_on, &params);
         return EXIT_SUCCESS;
-    } else if ((argc == 3) && (strcmp(argv[1], "ducker-range") == 0)) {
+}
+
+
+static
+int parse_command_ducker_range(const char *const param_range)
+    __attribute__(( nonnull(1) ));
+
+static
+int parse_command_ducker_range(const char *const param_range)
+{
         command_params_T params;
 
         char *p = NULL;
         errno = 0;
-        if (*(argv[2]) == '\0') {
+        if (*(param_range) == '\0') {
             fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
             return EXIT_FAILURE;
         }
-        const long lval = strtol(argv[2], &p, 0);
+        const long lval = strtol(param_range, &p, 0);
         if (p == NULL) {
             fprintf(stderr, "Fatal: Error converting number\n");
             return EXIT_FAILURE;
@@ -1027,16 +992,25 @@ int parse_cmdline(const int argc, const char *const argv[])
 
         run_command(commandfunc_ducker_range, &params);
         return EXIT_SUCCESS;
-    } else if ((argc == 3) && (strcmp(argv[1], "ducker-threshold") == 0)) {
+}
+
+
+static
+int parse_command_ducker_threshold(const char *const param_threshold)
+    __attribute__(( nonnull(1) ));
+
+static
+int parse_command_ducker_threshold(const char *const param_threshold)
+{
         command_params_T params;
 
         char *p = NULL;
         errno = 0;
-        if (*(argv[2]) == '\0') {
+        if (*(param_threshold) == '\0') {
             fprintf(stderr, "Fatal: Looking for number, got empty string.\n");
             return EXIT_FAILURE;
         }
-        const long lval = strtol(argv[2], &p, 0);
+        const long lval = strtol(param_threshold, &p, 0);
         if (p == NULL) {
             fprintf(stderr, "Fatal: Error converting number\n");
             return EXIT_FAILURE;
@@ -1085,6 +1059,76 @@ int parse_cmdline(const int argc, const char *const argv[])
 
         run_command(commandfunc_ducker_threshold, &params);
         return EXIT_SUCCESS;
+}
+
+
+static
+const char *arg0_to_prog(const char *const arg0);
+
+static
+const char *arg0_to_prog(const char *const arg0)
+{
+    const char *const last_slash = strrchr(arg0, '/');
+    const char *const after_last_slash = last_slash?(last_slash+1):arg0;
+    const char *const prog =
+        (*after_last_slash == '\0')?arg0:after_last_slash;
+
+#if 0
+    fprintf(stderr, "argv[0] %s\n", arg0);
+    fprintf(stderr, "last_slash %s\n", last_slash);
+    fprintf(stderr, "after_last_slash %s\n", after_last_slash);
+    fprintf(stderr, "prog %s\n", prog);
+#endif
+
+    return prog;
+}
+
+
+static
+int parse_cmdline(const int argc, const char *const argv[]);
+
+static
+int parse_cmdline(const int argc, const char *const argv[])
+{
+#if 0
+    for (int i=0; i<argc; i++) {
+        printf("%3d. %s\n", i, argv[i]);
+    }
+#endif
+
+    COND_OR_RETURN(argc > 0, "program invocations without arg0?!");
+
+    const char *const prog = arg0_to_prog(argv[0]);
+
+    COND_OR_RETURN(argc >= 2, "too few command line arguments");
+    COND_OR_RETURN(argc <= 4, "too many command line arguments");
+
+    if (false) {
+        /* nothing */
+    } else if ((argc == 2) && (strcmp(argv[1], "--help") == 0)) {
+        print_usage(prog);
+        return EXIT_SUCCESS;
+    } else if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
+        print_version(prog);
+        return EXIT_SUCCESS;
+    } else if ((argc == 3) && (strcmp(argv[1], "audio-routing") == 0)) {
+        return parse_command_audio_routing(argv[2]);
+    } else if ((argc == 2) && (strcmp(argv[1], "meter") == 0)) {
+        command_params_T params;
+        /* no params needed to run the meter */
+        run_command(commandfunc_meter, &params);
+        return EXIT_SUCCESS;
+    } else if ((argc == 2) && (strcmp(argv[1], "ducker-off") == 0)) {
+        command_params_T params;
+        /* no params needed to turn off ducker  */
+        run_command(commandfunc_ducker_off, &params);
+        return EXIT_SUCCESS;
+    } else if ((argc == 4) && (strcmp(argv[1], "ducker-on") == 0)) {
+        return parse_command_ducker_on(argv[2], argv[3]);
+    } else if ((argc == 3) && (strcmp(argv[1], "ducker-range") == 0)) {
+        return parse_command_ducker_range(argv[2]);
+    } else if ((argc == 3) && (strcmp(argv[1], "ducker-threshold") == 0)) {
+        return parse_command_ducker_threshold(argv[2]);
     } else {
         fprintf(stderr, "Fatal: Unhandled command line argument(s)\n");
         return EXIT_FAILURE;
