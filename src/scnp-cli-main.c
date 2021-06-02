@@ -1138,6 +1138,40 @@ int parse_command_ducker_threshold(const char *const param_threshold)
 }
 
 
+/* undocumented/unsupported command */
+static
+int parse_command_dump_tables(void)
+{
+    printf("\n");
+    printf("### value table for %s ###\n", "ducker range");
+    printf("\n");
+    printf("    %-6s  %-10s  %-10s\n", "__dB__", "_uint32_t_", "_uint32_t_");
+    for (int dB=0; dB<=90; dB+=10) {
+        const uint32_t u32 = dB_to_uint_range(dB);
+        printf("    %4ddB  0x%08x  %10u\n", dB, u32, u32);
+    }
+
+    printf("\n");
+    printf("### value table for %s ###\n", "ducker threshold");
+    printf("\n");
+    printf("    %-6s  %-10s  %-10s\n", "__dB__", "_uint32_t_", "_uint32_t_");
+    for (int dB=-60; dB<=0; dB+=10) {
+        const uint32_t u32 = dB_to_uint_threshold(dB);
+        printf("    %4ddB  0x%08x  %10u\n", dB, u32, u32);
+    }
+
+    printf("\n");
+    printf("### value table for %s ###\n", "ducker meter");
+    printf("\n");
+    printf("    %-6s  %-10s  %-10s\n", "__dB__", "_uint32_t_", "_uint32_t_");
+    for (int dB=-100; dB<=0; dB+=10) {
+        const uint32_t u32 = dB_to_uint_meter(dB);
+        printf("    %4ddB  0x%08x  %10u\n", dB, u32, u32);
+    }
+    return EXIT_SUCCESS;
+}
+
+
 static
 const char *arg0_to_prog(const char *const arg0);
 
@@ -1189,6 +1223,9 @@ int parse_cmdline(const int argc, const char *const argv[])
         return EXIT_SUCCESS;
     } else if ((argc == 3) && (strcmp(argv[1], "audio-routing") == 0)) {
         return parse_command_audio_routing(argv[2]);
+    } else if ((argc == 2) && (strcmp(argv[1], "dump-tables") == 0)) {
+        /* undocumented/unsupported command */
+        return parse_command_dump_tables();
     } else if ((argc == 2) && (strcmp(argv[1], "meter") == 0)) {
         command_params_T params;
         /* no params needed to run the meter */
