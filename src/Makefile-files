@@ -20,3 +20,5 @@ scnp_cli_CFLAGS   += $(PEDANTIC_C11_CFLAGS)
 
 scnp_cli_CFLAGS   += $(LIBUSB10_CFLAGS)
 scnp_cli_LDADD    += $(LIBUSB10_LIBS)
+
+scnp_cli_LDADD    += -lm

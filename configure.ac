@@ -52,12 +52,6 @@ dnl NDIM_PATH_PROG([wc])
 
 
 ########################################################################
-# Do we actually need -lm for using floor()?
-
-AC_CHECK_LIB([m], [floor])
-
-
-########################################################################
 # Look for libusb-1.0
 
 m4_pattern_forbid([^PKG_CHECK_MODULES])dnl
