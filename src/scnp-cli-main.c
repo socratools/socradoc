@@ -112,13 +112,28 @@ uint32_t dry_run_value = 0x00001000;
     } while (0)
 
 
+#if 0
+static
+double exp10a(const double x)
+{
+    const double log_nat_10 = log(10);
+    return exp(x * log_nat_10);
+}
+#endif
+
+
 static
 uint32_t dB_to_uint(const uint32_t ref_value, const double dB_value)
 {
     const double d_ref_value = ref_value;
-    /* For portability to non-glibc systems, we should offer a
-       reimplementation of exp10(e) */
+
+    /* If your compilation fails here due to the exp10(3) function not
+     * being available, uncomment the above reimplementation of
+     * exp10(3) in terms of log(3) and exp(3) for a quick fix and drop
+     * us a hint in the issue tracker. Thank you!
+     */
     const double d_uint_value = d_ref_value * exp10(dB_value/20.0);
+
     const long long_uint_value = lround(d_uint_value);
     BE_LONG_OR_FAIL(0L, long_uint_value);
     BE_LONG_OR_FAIL(long_uint_value, ref_value);
