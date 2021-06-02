@@ -1,45 +1,47 @@
 # -*- makefile -*-
 
-# This might not work when cross-compiling.
 
+AM_TESTS_ENVIRONMENT =
+
+# Run all tests without i18n and l10n for proper comparisons
+AM_TESTS_ENVIRONMENT += LC_ALL='C'; export LC_ALL;
+
+# Some variables needed in test case scripts
+AM_TESTS_ENVIRONMENT += SCNP_CLI='$(abs_top_builddir)/scnp-cli'; export SCNP_CLI;
+AM_TESTS_ENVIRONMENT += LSUSB='$(LSUSB)'; export LSUSB;
+AM_TESTS_ENVIRONMENT += WC='$(WC)'; export WC;
+
+
+# This might not work when cross-compiling.
 check_PROGRAMS += scnp-cli
 
-
-EXTRA_DIST  += %reldir%/scnp-cli--help.shin
-CLEANFILES  += %reldir%/scnp-cli--help.sh
+EXTRA_DIST  += %reldir%/scnp-cli--help.sh
 TESTS       += %reldir%/scnp-cli--help.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli--version.shin
-CLEANFILES  += %reldir%/scnp-cli--version.sh
+EXTRA_DIST  += %reldir%/scnp-cli--version.sh
 TESTS       += %reldir%/scnp-cli--version.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_no-arguments.shin
-CLEANFILES  += %reldir%/scnp-cli_no-arguments.sh
+EXTRA_DIST  += %reldir%/scnp-cli_no-arguments.sh
 TESTS       += %reldir%/scnp-cli_no-arguments.sh
 XFAIL_TESTS += %reldir%/scnp-cli_no-arguments.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_unknown.shin
-CLEANFILES  += %reldir%/scnp-cli_unknown.sh
+EXTRA_DIST  += %reldir%/scnp-cli_unknown.sh
 TESTS       += %reldir%/scnp-cli_unknown.sh
 XFAIL_TESTS += %reldir%/scnp-cli_unknown.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_-1.shin
-CLEANFILES  += %reldir%/scnp-cli_audio-routing_-1.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_-1.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_-1.sh
 XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_-1.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_4.shin
-CLEANFILES  += %reldir%/scnp-cli_audio-routing_4.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_4.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_4.sh
 XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_4.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_emptystr.shin
-CLEANFILES  += %reldir%/scnp-cli_audio-routing_emptystr.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_emptystr.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_emptystr.sh
 XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_emptystr.sh
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.shin
-CLEANFILES  += %reldir%/scnp-cli_audio-routing_nothing.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_nothing.sh
 XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.sh
 
@@ -51,10 +53,9 @@ XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.sh
 # default value of 3 - in the hope that this is the value the hardware
 # already had been set to.
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.shin
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.sh
 if HAVE_LSUSB
 if HAVE_WC
-CLEANFILES  += %reldir%/scnp-cli_audio-routing_3.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_3.sh
 endif
 endif
