@@ -44,5 +44,62 @@ EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_nothing.sh
 XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.sh
 
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_0.sh
+TESTS       += %reldir%/scnp-cli_audio-routing_0.sh
+
 EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.sh
 TESTS       += %reldir%/scnp-cli_audio-routing_3.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-off.sh
+TESTS       += %reldir%/scnp-cli_ducker-off.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0_0ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_0_0ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_15_1000ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_15_1000ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_16_1000ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_16_1000ms.sh
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-on_16_1000ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b0000_0ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_0b0000_0ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_0ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_0ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_5000ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_5000ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.sh
+TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.sh
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_-10dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-range_-10dB.sh
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-range_-10dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_0dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-range_0dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_90dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-range_90dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_100dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-range_100dB.sh
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-range_100dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_10dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-threshold_10dB.sh
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-threshold_10dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_0dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-threshold_0dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_-60dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-threshold_-60dB.sh
+
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_-70dB.sh
+TESTS       += %reldir%/scnp-cli_ducker-threshold_-70dB.sh
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-threshold_-70dB.sh
