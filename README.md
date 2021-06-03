@@ -78,7 +78,8 @@ Commands:
     ducker-on <INPUTS> <RELEASE>ms
                Turn the ducker on and set the following values:
                  INPUTS (range 0..15) is a bitmask for the input "selection"
-                         0 = no inputs watched, 15 = all four inputs watched
+                         0b0000 =  0 = no inputs watched
+                         0b1111 = 15 = all four inputs watched
                  RELEASE (range 0..5000) is a the "release" time in ms
                          0 = release time 0, 5000 = release time 5000ms=5s
 
