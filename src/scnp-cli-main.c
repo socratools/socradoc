@@ -663,11 +663,11 @@ void usbdev_meter(usbdev_T *usbdev)
 
     printf("\n");
     printf("meter summary:\n"
-           "  %s  %6.1fdB  0x%08x = %-9u\n"
-           "  %s  %6.1fdB  0x%08x = %-9u\n"
+           "  %s  %9u = 0x%08x  %6.1fdB\n"
+           "  %s  %9u = 0x%08x  %6.1fdB\n"
            "",
-           "minimum", min_double, min_value, min_value,
-           "maximum", max_double, max_value, max_value);
+           "minimum", min_value, min_value, min_double,
+           "maximum", max_value, max_value, max_double);
 }
 
 
