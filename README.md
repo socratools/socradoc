@@ -1,25 +1,34 @@
 scnp-cli
 ========
 
-A simple CLI written in C for selecting the mixer channelsof the
-[Soundcraft Notepad
+The `scnp-cli` utility is a simple CLI written in C which implements
+the USB control commands described in
+[doc/soundcraft-notepad-usb-protocol.html](doc/soundcraft-notepad-usb-protocol.md)
+to make help verify the protocol description is accurate.
+
+[doc/soundcraft-notepad-usb-protocol.html](doc/soundcraft-notepad-usb-protocol.md)
+describes how to tell a [Soundcraft Notepad
 series](https://www.soundcraft.com/en/product_families/notepad-series)
-of mixer to connect to the USB audio capture device:
+mixer device which audio channels to route to the USB capture device,
+and whether and how to configure the Ducker for the USB playback.
+
+The Soundcraft Notepad series consists of these three devices:
 
   * [Notepad-5](https://www.soundcraft.com/en/products/notepad-5)
   * [Notepad-8FX](https://www.soundcraft.com/en/products/notepad-8fx)
   * [Notepad-12FX](https://www.soundcraft.com/en/products/notepad-12fx)
 
-If you want a nice GUI for that, go over to
+If you want a nice GUI for controlling a Notepad mixer but Soundcraft
+does not provide one for your computer, go over to
 [soundcraft-utils](https://github.com/lack/soundcraft-utils) for a
 nice GUI which even synchronizes between multiple instances of its GUI
 and CLI. [soundcraft-utils](https://github.com/lack/soundcraft-utils)
 is written in Python, uses a D-Bus service to provide a better user
 experience across tool invocations, and uses Gtk3 for the GUI.
 
-`scnp-cli` could be helpful if you do not want to install the whole
-Python software stack just to change the mixer's audio routing to the
-USB device.
+`scnp-cli` could also be helpful if you do not want to install the
+whole Python software stack just to change the mixer's audio routing
+to the USB device.
 
 
 Runtime requirements
@@ -32,7 +41,8 @@ and `libusb-1.0` for running `scnp-cli`.
 Usage
 -----
 
-This is the output of `scnp-cli --help`:
+This is the output of `scnp-cli --help`. A more detailed description
+is available in the `scnp-cli(1)` man page.
 
 ```
 Usage: scnp-cli <command> <command_params...>
