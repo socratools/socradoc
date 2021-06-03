@@ -184,6 +184,8 @@ All ducker related commands appear to use the following format:
            │  └────────────── ducker command (0x80, 0x81, 0x82)
            └───────────────── 0x02 = ducker related command
 
+    The unlabled bytes have always been observed to be 0x00.
+
 
 `ducker on/off` command
 -----------------------
@@ -200,6 +202,8 @@ observe, and the ducker's release time:
            │  │  └─────────── 0x01 = enable ducker, 0x00 disable ducker
            │  └────────────── 0x80 = ducker on/off command
            └───────────────── 0x02 = ducker related command
+
+    The unlabled bytes have always been observed to be 0x00.
 
 On the Notepad-12FX, the four inputs we can select from are the same
 four channels which are available on the USB capture device:
@@ -235,12 +239,14 @@ TODO: What is a reasonable ms release value a GUI could start with?
 CONTROL OUT message with endpoint 0 setting the "duck range":
 
     00 00 02 81 00 00 4a 67
-          ┗┩ ┗┩     ┗━━━━━━━━━┩
+          ┗┩ ┗┩ ┗━━━━━━━━━┩
            │  │           └── network endian "duck range" value
            │  │               observed range is 0x1fff_ffff to 0x0000_4a67
            │  │               corresponding to displayed values of 0dB to 90dB
            │  └────────────── 0x81 = ducker range command
            └───────────────── 0x02 = ducker related command
+
+    The unlabled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
@@ -285,6 +291,8 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
            │  │               corresponding to displayed values of -60dB to 0dB
            │  └────────────── 0x82 = ducker threshold command
            └───────────────── 0x02 = ducker related command
+
+    The unlabled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
@@ -332,13 +340,14 @@ Weirdly enough, the reply data is the only place in the Notepad USB
 protocol which uses a multibyte value in LITTLE ENDIAN.
 
     bd 07 00 01 00 00 00 00
-    ┗━━━━━━━━━┩ ┗━━━━━━━━━┩
-              │           └── always observed full of 0x00
+    ┗━━━━━━━━━┩
               └────────────── meter value in LITTLE ENDIAN!
                               observed range:
                                 * 0x0000008e .. 0x010007bd (stereo input)
                                 * 0x0000009e .. 0x00800000 (mono input)
                                 * continuously 0x00000000 while is ducker off
+
+    The unlabled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
