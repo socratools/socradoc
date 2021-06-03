@@ -142,33 +142,36 @@ Report bugs to
     [user@host ~]$ \fBscnp\-cli\fR \fBaudio\-routing\fR \fI2\fR
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad\-12FX
     Setting USB audio source to 2 (LINE 7+8) for device NOTEPAD\-12FX
-    [user@host ~]$
+    [user@host ~]$ 
 .PP
     [user@host ~]$ \fBscnp\-cli\fR \fBducker\-on\fR \fI2\fR \fI2000\fRms
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad\-12FX
     ducker\-on inputs=2 release_ms=2000 NOTEPAD\-12FX
     device_send_ctrl_message(device, {00 00 02 80 01 02 07 d0})
-    [user@host ~]$
+    [user@host ~]$ 
 .PP
     [user@host ~]$ \fBscnp\-cli\fR \fBducker\-range\fR \fI69\fRdB
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad\-12FX
     ducker\-range range=0x18888887=411601031 NOTEPAD\-12FX
     device_send_ctrl_message(device, {00 00 02 81 18 88 88 87})
-    [user@host ~]$
+    [user@host ~]$ 
 .PP
     [user@host ~]$ \fBscnp\-cli\fR \fBducker\-threshold\fR \fI-16\fRdB
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad\-12FX
     ducker\-threshold thresh=6151645 NOTEPAD\-12FX
     device_send_ctrl_message(device, {00 00 02 82 00 5d dd dd})
-    [user@host ~]$
+    [user@host ~]$ 
 .PP
 The following display has been shortened a bit to fit into a 80 character line.
 
     [user@host ~]$ \fBscnp\-cli\fR \fBmeter\fR
     Bus 006 Device 003: ID 05fc:0032 Soundcraft Notepad\-12FX
     meter for NOTEPAD\-12FX. Press Ctrl\-C to quit.
-    0x0049ade6 41 [#####################^C##\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-]
-    [user@host ~]$
+    ^C00000b8d  -75.1dB [###############-------------------------------------------------]
+    meter summary:
+      minimum   -79.7dB  0x000006ca = 1738     
+      maximum    -6.0dB  0x00800000 = 8388608  
+    [user@host ~]$ 
 .\"
 .\" ====================================================================
 .\"
