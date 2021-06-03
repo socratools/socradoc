@@ -335,8 +335,10 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
     ┗━━━━━━━━━┩ ┗━━━━━━━━━┩
               │           └── always observed full of 0x00
               └────────────── meter value in LITTLE ENDIAN!
-                              observed range: 0x0000008e .. 0x010007bd
-                              continuously 0x00000000 while is ducker off
+                              observed range:
+                                * 0x0000008e .. 0x010007bd (stereo input)
+                                * 0x0000009e .. 0x00800000 (mono input)
+                                * continuously 0x00000000 while is ducker off
 
 To map the integer values to dB values, the following equation looks
 plausible:
