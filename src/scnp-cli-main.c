@@ -624,6 +624,7 @@ void usbdev_meter(usbdev_T *usbdev)
             meterbuf[i] = '-';
         }
         printf("0x%08x %6.1fdB %s\r", cur_value, dB, meterbuf);
+        fflush(stdout);
 
         const struct timespec req = { 0L, 50L*1000L*1000L };
         struct timespec rem;
