@@ -623,7 +623,7 @@ void usbdev_meter(usbdev_T *usbdev)
         for (size_t i=1+idx; i<1+METER_WIDTH; ++i) {
             meterbuf[i] = '-';
         }
-        printf("0x%08x %2u %s\r", cur_value, idx, meterbuf);
+        printf("0x%08x %6.1fdB %s\r", cur_value, dB, meterbuf);
 
         const struct timespec req = { 0L, 50L*1000L*1000L };
         struct timespec rem;
