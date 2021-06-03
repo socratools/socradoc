@@ -36,6 +36,9 @@
 #include <string.h>
 
 
+#include <unistd.h>
+
+
 #include <libusb.h>
 
 
@@ -562,6 +565,10 @@ void usbdev_meter(usbdev_T *usbdev)
 static
 void usbdev_meter(usbdev_T *usbdev)
 {
+    const int stdout_fileno = fileno(stdout);
+    COND_OR_FAIL(isatty(stdout_fileno),
+                 "The interactive meter only works inside a TTY");
+
     printf("meter for %s. Press Ctrl-C to quit.\n",
            usbdev->notepad_device->name);
 
