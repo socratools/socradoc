@@ -595,6 +595,11 @@ void usbdev_meter(usbdev_T *usbdev)
     double min_double = +DBL_MAX;
     double max_double = -DBL_MAX;
 
+    /* We could use unicode block characters. We could use ANSI
+     * colors. But unicode block characters might not be
+     * available. ANSI colors might not be. termcap is complex. And we
+     * are lazy. */
+
 #define METER_WIDTH 63UL
 
     static char meterbuf[76];
