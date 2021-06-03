@@ -595,7 +595,7 @@ void usbdev_meter(usbdev_T *usbdev)
     double min_double = +DBL_MAX;
     double max_double = -DBL_MAX;
 
-#define METER_WIDTH 64UL
+#define METER_WIDTH 63UL
 
     static char meterbuf[76];
     for (size_t i=1; i<1+METER_WIDTH; ++i) {
@@ -606,6 +606,8 @@ void usbdev_meter(usbdev_T *usbdev)
     meterbuf[2+METER_WIDTH] = '\0';
 
     signal(SIGINT, handle_signal);
+
+    printf("uintval   dB    bar graph\n");
 
     while (!global_abort) {
         device_recv_ctrl_message(usbdev->device_handle, data, sizeof(data));
@@ -646,7 +648,7 @@ void usbdev_meter(usbdev_T *usbdev)
         for (size_t i=1+idx; i<1+METER_WIDTH; ++i) {
             meterbuf[i] = '-';
         }
-        printf("0x%08x %6.1fdB %s\r", cur_value, dB, meterbuf);
+        printf("%07x %6.1f %s\r", cur_value, dB, meterbuf);
         fflush(stdout);
 
         const struct timespec req = { 0L, 50L*1000L*1000L };
