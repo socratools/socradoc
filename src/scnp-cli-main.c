@@ -26,6 +26,7 @@
 
 
 #include <errno.h>
+#include <float.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <math.h>
@@ -36,6 +37,7 @@
 #include <string.h>
 
 
+#include <signal.h>
 #include <unistd.h>
 
 
@@ -559,8 +561,21 @@ void usbdev_ducker_threshold(usbdev_T *usbdev,
 
 
 static
+volatile sig_atomic_t global_abort = false;
+
+
+extern
+void handle_signal(int unused_signum);
+
+void handle_signal(int unused_signum __attribute__(( unused )))
+{
+    global_abort = true;
+}
+
+
+static
 void usbdev_meter(usbdev_T *usbdev)
-    __attribute__(( nonnull(1), noreturn ));
+    __attribute__(( nonnull(1) ));
 
 static
 void usbdev_meter(usbdev_T *usbdev)
@@ -577,6 +592,9 @@ void usbdev_meter(usbdev_T *usbdev)
     uint32_t min_value = 0xffffffff;
     uint32_t max_value = 0x00000000;
 
+    double min_double = +DBL_MAX;
+    double max_double = -DBL_MAX;
+
 #define METER_WIDTH 64UL
 
     static char meterbuf[76];
@@ -587,7 +605,9 @@ void usbdev_meter(usbdev_T *usbdev)
     meterbuf[1+METER_WIDTH] = ']';
     meterbuf[2+METER_WIDTH] = '\0';
 
-    while (true) {
+    signal(SIGINT, handle_signal);
+
+    while (!global_abort) {
         device_recv_ctrl_message(usbdev->device_handle, data, sizeof(data));
         const uint32_t cur_value =
             (((uint32_t)data[0])<< 0) |
@@ -600,24 +620,20 @@ void usbdev_meter(usbdev_T *usbdev)
         if (cur_value > max_value) {
             max_value = cur_value;
         }
-#if 0
-        printf("meter"
-               " min=0x%08x=%-9u"
-               " <="
-               " cur=0x%08x=%-9u"
-               " <="
-               " max=0x%08x=%-9u"
-               "\n",
-               min_value, min_value,
-               cur_value, cur_value,
-               max_value, max_value);
-#endif
+
 
         /* original dB value can be slightly outside the -100.0 .. 0.0 range */
         const double raw_dB = uint_to_dB_meter(cur_value);
         const double raw_dB1 = (raw_dB < -100.0) ? -100.0 : raw_dB;
         /* dB value constrained into -100.0 to 0.0 interval */
         const double dB = (raw_dB1 > 0.0) ? 0.0 : raw_dB1;
+
+        if (raw_dB < min_double) {
+            min_double = raw_dB;
+        }
+        if (raw_dB > max_double) {
+            max_double = raw_dB;
+        }
 
         const double d_idx = ((100.0 + dB) * METER_WIDTH) * 0.01;
         const uint32_t idx = (uint32_t) d_idx;
@@ -637,6 +653,14 @@ void usbdev_meter(usbdev_T *usbdev)
         struct timespec rem;
         (void) nanosleep(&req, &rem);
     }
+
+    printf("\n");
+    printf("meter summary:\n"
+           "  %s  %6.1fdB  0x%08x = %-9u\n"
+           "  %s  %6.1fdB  0x%08x = %-9u\n"
+           "",
+           "minimum", min_double, min_value, min_value,
+           "maximum", max_double, max_value, max_value);
 }
 
 
@@ -711,7 +735,7 @@ void commandfunc_ducker_threshold(usbdev_T *usbdev,
 static
 void commandfunc_meter(usbdev_T *usbdev,
                        command_params_T *params __attribute__(( unused )) )
-    __attribute__(( nonnull(1), noreturn ));
+    __attribute__(( nonnull(1) ));
 
 static
 void commandfunc_meter(usbdev_T *usbdev,
