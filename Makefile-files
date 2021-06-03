@@ -6,6 +6,6 @@ doc_DATA   += LICENSE
 EXTRA_DIST += README.md
 doc_DATA   += README.md
 
-EXTRA_DIST     += scnp-cli-ALL_COMMANDS.shin
-CLEANFILES     += scnp-cli-ALL_COMMANDS.sh
-noinst_SCRIPTS += scnp-cli-ALL_COMMANDS.sh
+EXTRA_DIST     += interactive-meter-test.shin
+CLEANFILES     += interactive-meter-test.sh
+noinst_SCRIPTS += interactive-meter-test.sh
