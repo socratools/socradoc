@@ -651,7 +651,7 @@ void usbdev_meter(usbdev_T *usbdev)
         printf("%07x %6.1f %s\r", cur_value, dB, meterbuf);
         fflush(stdout);
 
-        const struct timespec req = { 0L, 50L*1000L*1000L };
+        const struct timespec req = { 0L, 100L*1000L*1000L };
         struct timespec rem;
         (void) nanosleep(&req, &rem);
     }
