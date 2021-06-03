@@ -47,6 +47,13 @@ sed_commands += -e 's|[@]docdir@|$(docdir)|g'
 
 .1in.1:
 	@$(MKDIR_P) $(@D)
-	$(SED) $(sed_commands) $< > $@.$$$$.new && mv -f $@.$$$$.new $@
+	set -e; \
+	$(SED) $(sed_commands) $< > $@.$$$$.new; \
+	if grep -v '^\.\\"' $< | grep '[^\]-'; then \
+		echo "Error: '-' characters in $@ man page must be escaped."; \
+		exit 1; \
+	fi; \
+	mv -f $@.$$$$.new $@
+
 
 ########################################################################
