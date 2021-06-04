@@ -323,7 +323,7 @@ TODO: What is a reasonable dB threshold value a GUI could start with?
 
 
 `ducker meter` query
-------------------
+--------------------
 
 It appears that to show the meter bar graph in the GUI, the
 **Soundcraft USB audio control panel** just issues a USB Ctrl IN
