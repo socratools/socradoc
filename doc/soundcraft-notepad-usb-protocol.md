@@ -126,7 +126,7 @@ MIC 1 + MIC 2.
            │     └─────────── index into source table (range 0x00..0x03)
            └───────────────── 0x04 = audio routing command
 
-    The unlabled bytes have always been observed to be 0x00.
+    The unlabeled bytes have always been observed to be 0x00.
 
 Table of possible audio sources for the Notepad-5:
 
@@ -184,7 +184,7 @@ All ducker related commands appear to use the following format:
            │  └────────────── ducker command (0x80, 0x81, 0x82)
            └───────────────── 0x02 = ducker related command
 
-    The unlabled bytes have always been observed to be 0x00.
+    The unlabeled bytes have always been observed to be 0x00.
 
 
 `ducker on/off` command
@@ -203,7 +203,7 @@ observe, and the ducker's release time:
            │  └────────────── 0x80 = ducker on/off command
            └───────────────── 0x02 = ducker related command
 
-    The unlabled bytes have always been observed to be 0x00.
+    The unlabeled bytes have always been observed to be 0x00.
 
 On the Notepad-12FX, the four inputs we can select from are the same
 four channels which are available on the USB capture device:
@@ -246,7 +246,7 @@ CONTROL OUT message with endpoint 0 setting the "duck range":
            │  └────────────── 0x81 = ducker range command
            └───────────────── 0x02 = ducker related command
 
-    The unlabled bytes have always been observed to be 0x00.
+    The unlabeled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
@@ -292,7 +292,7 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
            │  └────────────── 0x82 = ducker threshold command
            └───────────────── 0x02 = ducker related command
 
-    The unlabled bytes have always been observed to be 0x00.
+    The unlabeled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
@@ -347,7 +347,7 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
                                 * 0x0000009e .. 0x00800000 (mono input)
                                 * continuously 0x00000000 while is ducker off
 
-    The unlabled bytes have always been observed to be 0x00.
+    The unlabeled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
