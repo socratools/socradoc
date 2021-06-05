@@ -64,7 +64,7 @@ used to receive 8 bytes of data:
     receives 8 byte of data buffer
 
 Caution: While most of the multi byte values in the data buffer are
-         big endian, but some are little endian.
+         big endian, some are little endian.
 
 
 Mixer state vs host software state
