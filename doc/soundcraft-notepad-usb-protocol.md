@@ -121,6 +121,7 @@ select the two mixer channels going to USB capture device channels
 3+4, but the USB capture device channels 1+2 are always fixed to
 MIC 1 + MIC 2.
 
+     0  1  2  3  4  5  6  7
     00 00 04 00 00 00 00 00
           ┗┩    ┗┩
            │     └─────────── index into source table (range 0x00..0x03)
@@ -178,6 +179,7 @@ implementing commands to Notepad series mixers.
 
 All ducker related commands appear to use the following format:
 
+     0  1  2  3  4  5  6  7
     00 00 02 cc xx xx xx xx
           ┗┩ ┗┩ ┗━━━━━━━━━┩
            │  │           └── command specific parameters
@@ -194,6 +196,7 @@ The `ducker on/off` command not only enables/disables the ducker, but
 it also configures the set of "input" channels the ducker is to
 observe, and the ducker's release time:
 
+     0  1  2  3  4  5  6  7
     00 00 02 80 01 01 0c 15
           ┗┩ ┗┩ ┗┩ ┗┩ ┗━━━┩
            │  │  │  │     └── release value in ms (network endian)
@@ -238,6 +241,7 @@ TODO: What is a reasonable ms release value a GUI could start with?
 
 CONTROL OUT message with endpoint 0 setting the "duck range":
 
+     0  1  2  3  4  5  6  7
     00 00 02 81 00 00 4a 67
           ┗┩ ┗┩ ┗━━━━━━━━━┩
            │  │           └── network endian "duck range" value
@@ -284,6 +288,7 @@ TODO: What is a reasonable dB range value a GUI could start with?
 
 CONTROL OUT message with endpoint 0 setting the "threshold":
 
+     0  1  2  3  4  5  6  7
     00 00 02 82 00 7f ff ff
           ┗┩ ┗┩ ┗━━━━━━━━━┩
            │  │           └── network endian threshold value
@@ -339,6 +344,7 @@ meter value:
 Weirdly enough, the reply data is the only place in the Notepad USB
 protocol which uses a multibyte value in LITTLE ENDIAN.
 
+     0  1  2  3  4  5  6  7
     bd 07 00 01 00 00 00 00
     ┗━━━━━━━━━┩
               └────────────── meter value in LITTLE ENDIAN!
