@@ -411,6 +411,6 @@ actually enabled definitively applies here.
      -10dB  0x0050f44e     5305422
        0dB  0x01000000    16777216
 
-Caution: We have observed meter_uint values **outside** the range
-         given by this table, such as e.g. `0x010007bd` corresponding to
-         `0.001dB`.
+Caution: We have observed meter_uint values **outside** the range this
+         table shows, so any software needs to deal with that. See
+         above for more details.
