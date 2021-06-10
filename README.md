@@ -105,6 +105,7 @@ Commands:
 
     meter
                Show the meter until you press Ctrl-C
+               It may be best to only use this while ducker is on.
 ```
 
 

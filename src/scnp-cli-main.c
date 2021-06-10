@@ -904,6 +904,7 @@ void print_usage(const char *const prog)
            "\n"
            "    meter\n"
            "               Show the meter until you press Ctrl-C\n"
+           "               It may be best to only use this while ducker is on.\n"
            );
 }
 
