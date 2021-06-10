@@ -52,7 +52,7 @@ requests we have observed all have the following properties:
 
     sends 8 byte command data buffer
 
-    0  1  2  3  4  5  6  7
+     0  1  2  3  4  5  6  7
     00 00 02 81 00 00 4a 67
           ┗┩ ┗┩ ┗━━━━━━━━━┩
            │  │           └── parameter(s) for the specific command
