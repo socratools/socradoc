@@ -1,5 +1,15 @@
-scnp-cli
+socradoc
 ========
+
+The socradoc repository contains 3rd party documentation on the
+[Soundcraft](https://www.soundcraft.com/)'s [Notepad
+series](https://www.soundcraft.com/en/product_families/notepad-series)
+of analog mixers with USB audio and USB control of some functions.
+
+The socradoc repository is **NOT** related to or affiliated with
+Soundcraft at all. If you are looking for Soundcraft themselves, this
+is the **wrong** place. Go visit [the Soundcraft
+website](https://www.soundcraft.com/) instead.
 
 [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
 describes how to tell a [Soundcraft Notepad

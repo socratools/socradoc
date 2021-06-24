@@ -3,11 +3,11 @@
 ########################################################################
 
 AC_PREREQ([2.69])
-AC_INIT([Soundcraft Notepad series mixer CLI],
+AC_INIT([Documentation for the Soundcraft Notepad series],
         [m4_esyscmd([./build-helpers/package-version . version-stamp])],
-        [https://github.com/ndim/scnp-cli/issues],
-        [scnp-cli],
-        [https://github.com/ndim/scnp-cli])
+        [https://github.com/socratools/socradoc/issues],
+        [socradoc],
+        [https://github.com/socratools/socradoc])
 AC_CONFIG_AUX_DIR([auto-aux])
 AC_CONFIG_MACRO_DIR([auto-m4])
 AC_CONFIG_SRCDIR([src/scnp-cli-main.c])
