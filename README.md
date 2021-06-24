@@ -1,16 +1,16 @@
 scnp-cli
 ========
 
-The `scnp-cli` utility is a simple CLI written in C which implements
-the USB control commands described in
-[doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
-to make help verify the protocol description is accurate.
-
 [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
 describes how to tell a [Soundcraft Notepad
 series](https://www.soundcraft.com/en/product_families/notepad-series)
 mixer device which audio channels to route to the USB capture device,
 and whether and how to configure the Ducker for the USB playback.
+
+The `scnp-cli` utility is a simple CLI written in C which implements
+the USB control commands described in
+[doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
+to make help verify the protocol description is accurate.
 
 The Soundcraft Notepad series consists of these three devices:
 
