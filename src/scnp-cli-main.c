@@ -769,7 +769,7 @@ void run_command(command_func_T command_func,
     ssize_t dev_count = supported_device_list(&dev_list);
 
     if (dev_count == 0) {
-        fprintf(stderr, "No Notepad devices found\n");
+        fprintf(stderr, "No Notepad device found\n");
         exit(EXIT_FAILURE);
     }
     if (dev_count > 1) {
@@ -786,7 +786,7 @@ void run_command(command_func_T command_func,
 
     const notepad_device_T *const notepad_device =
         notepad_device_from_idProduct(descriptor.idProduct);
-    COND_OR_FAIL(notepad_device != NULL, "no supported idProduct found");
+    COND_OR_FAIL(notepad_device != NULL, "unhandled idProduct");
 
     libusb_device_handle *device_handle;
     const int luret_open =
