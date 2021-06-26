@@ -302,7 +302,7 @@ ssize_t supported_device_list(libusb_device ***device_list)
     }
     libusb_free_device_list(devices, 1);
 
-    COND_OR_FAIL(ret_count > 0, "device number overflow... uhm what?");
+    COND_OR_FAIL(ret_count >= 0, "device number overflow... uhm what?");
 
     /* NULL terminate list like the libusb_get_device_list retval */
     ret_list[ret_count] = NULL;
@@ -786,7 +786,7 @@ void run_command(command_func_T command_func,
 
     const notepad_device_T *const notepad_device =
         notepad_device_from_idProduct(descriptor.idProduct);
-    COND_OR_FAIL(notepad_device != NULL, "unhandled idProduct");
+    COND_OR_FAIL(notepad_device != NULL, "no supported idProduct found");
 
     libusb_device_handle *device_handle;
     const int luret_open =
