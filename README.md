@@ -30,9 +30,9 @@ The Soundcraft Notepad series consists of these three devices:
 
 If you want a nice GUI for controlling a Notepad mixer but Soundcraft
 does not provide one for your computer, go over to
-[soundcraft-utils](https://github.com/lack/soundcraft-utils) for a
+[socranop](https://github.com/socratools/socranop) for a
 nice GUI which even synchronizes between multiple instances of its GUI
-and CLI. [soundcraft-utils](https://github.com/lack/soundcraft-utils)
+and CLI. [socranop](https://github.com/socratools/socranop)
 is written in Python, uses a D-Bus service to provide a better user
 experience across tool invocations, and uses Gtk3 for the GUI.
 
