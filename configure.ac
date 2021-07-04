@@ -141,6 +141,33 @@ PEDANTIC_C11_CFLAGS="$ndim_new"
 # Checks for library functions.
 ########################################################################
 
+saved_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="-D_GNU_SOURCE"
+saved_LIBS="$LIBS"
+LIBS="-lm"
+AC_MSG_CHECKING([for exp10 function])
+AC_LINK_IFELSE([dnl
+AC_LANG_PROGRAM([[
+#include <math.h>
+#include <stdio.h>
+]], [[
+  double x;
+  for (x=-10.0; x<=10.0; x += 0.1) {
+    const double d = exp10(x);
+    printf("%f\n", d);
+  }
+]])
+], [dnl
+AC_MSG_RESULT([yes])
+AM_CPPFLAGS="$AM_CPPFLAGS -D_GNU_SOURCE -DHAVE_EXP10_FUNCTION"
+], [dnl
+AC_MSG_RESULT([no])
+])
+CPPFLAGS="$saved_CPPFLAGS"
+LIBS="$saved_LIBS"
+
+
+AC_SUBST([AM_CPPFLAGS])
 
 
 ########################################################################

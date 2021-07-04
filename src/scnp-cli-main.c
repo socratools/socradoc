@@ -117,12 +117,16 @@ uint32_t dry_run_value = 0x00001000;
     } while (0)
 
 
-#if 0
-static
-double exp10a(const double x)
+#ifndef HAVE_EXP10_FUNCTION
+inline static
+double exp10(double x);
+
+inline static
+double exp10(double x)
 {
-    const double log_nat_10 = log(10);
-    return exp(x * log_nat_10);
+    /* Just hoping that the pre-2.28 glibc pow() >10000 times slowness
+     * bug does not appear to the values we are using. */
+    return pow(10.0, x);
 }
 #endif
 
