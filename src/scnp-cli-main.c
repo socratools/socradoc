@@ -618,7 +618,7 @@ void usbdev_meter(usbdev_T *usbdev)
 
     printf("uintval   dB    bar graph\n");
 
-    while (!global_abort) {
+    while (true) {
         device_recv_ctrl_message(usbdev->device_handle, data, sizeof(data));
         const uint32_t cur_value =
             (((uint32_t)data[0])<< 0) |
@@ -663,6 +663,16 @@ void usbdev_meter(usbdev_T *usbdev)
         const struct timespec req = { 0L, 100L*1000L*1000L };
         struct timespec rem;
         (void) nanosleep(&req, &rem);
+
+        if (global_abort) {
+            /* When Ctrl-C has been pressed, re-print the meter line
+             * to overwrite the "^C" shown at the beginning of the
+             * line before leaving the loop.
+             */
+            printf("\r%07x %6.1f %s  \r", cur_value, dB, meterbuf);
+            fflush(stdout);
+            break;
+        }
     }
 
     printf("\n");
@@ -673,7 +683,6 @@ void usbdev_meter(usbdev_T *usbdev)
            "minimum", min_value, min_value, min_double,
            "maximum", max_value, max_value, max_double);
 }
-
 
 typedef union {
     struct {
