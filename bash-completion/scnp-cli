@@ -7,11 +7,11 @@ _scnp_cli()
     # $3 is the preceding word
     case "$3" in
         scnp-cli | */scnp-cli)
-            COMPREPLY=($(compgen -W "audio-routing ducker-off ducker-on ducker-range ducker-threshold meter" "$2"))
+            COMPREPLY=($(compgen -W "audio-routing ducker-off ducker-on ducker-range ducker-threshold meter" -- "$2"))
             return
             ;;
         audio-routing)
-            COMPREPLY=($(compgen -W "0 1 2 3" "$2"))
+            COMPREPLY=($(compgen -W "0 1 2 3" -- "$2"))
             return
             ;;
         ducker-off)
@@ -20,21 +20,21 @@ _scnp_cli()
         ducker-on)
             case "$2" in
                 "" | 0b*)
-                    COMPREPLY=($(compgen -W "0b0000 0b0001 0b0010 0b0011 0b0100 0b0101 0b0110 0b0111 0b1000 0b1001 0b1010 0b1011 0b1100 0b1101 0b1110 0b1111" "$2"))
+                    COMPREPLY=($(compgen -W "0b0000 0b0001 0b0010 0b0011 0b0100 0b0101 0b0110 0b0111 0b1000 0b1001 0b1010 0b1011 0b1100 0b1101 0b1110 0b1111" -- "$2"))
                     return
                     ;;
                 *)
-                    COMPREPLY=($(compgen -W "$(seq 0 15)" "$2"))
+                    COMPREPLY=($(compgen -W "$(seq 0 15)" -- "$2"))
                     return
             esac
             ;;
         ducker-range)
             case "$2" in
                 0x*)
-                    COMPREPLY=($(compgen -W "$(for n in $(seq 0 "$(printf "%u\n" 0x8000)" "$(printf "%u\n" 0x007fffff)"); do printf "0x%x\n" "$n"; done)" "$2"))
+                    COMPREPLY=($(compgen -W "$(for n in $(seq 0 "$(printf "%u\n" 0x8000)" "$(printf "%u\n" 0x007fffff)"); do printf "0x%x\n" "$n"; done)" -- "$2"))
                     ;;
                 *)
-                    COMPREPLY=($(compgen -W "$(seq -f "%.0fdB" 0 90)" "$2"))
+                    COMPREPLY=($(compgen -W "$(seq -f "%.0fdB" 0 90)" -- "$2"))
                     ;;
             esac
             return
@@ -42,7 +42,7 @@ _scnp_cli()
         ducker-threshold)
             case "$2" in
                 0x*)
-                    COMPREPLY=($(compgen -W "$(for n in $(seq 0 "$(printf "%u\n" 0x200000)" "$(printf "%u\n" 0x1fffffff)"); do printf "0x%x\n" "$n"; done)" "$2"))
+                    COMPREPLY=($(compgen -W "$(for n in $(seq 0 "$(printf "%u\n" 0x200000)" "$(printf "%u\n" 0x1fffffff)"); do printf "0x%x\n" "$n"; done)" -- "$2"))
                     ;;
                 *)
                     COMPREPLY=($(compgen -W "$(seq -f "%.0fdB" -60 0)" -- "$2"))
@@ -58,7 +58,7 @@ _scnp_cli()
     local i="$(( "$COMP_CWORD" - 2 ))"
     case "${COMP_WORDS[$i]}" in
         ducker-on)
-            COMPREPLY=($(compgen -W "$(seq -f "%.0fms" 0 100 5000)" "$2"))
+            COMPREPLY=($(compgen -W "$(seq -f "%.0fms" 0 100 5000)" -- "$2"))
             return
             ;;
     esac
