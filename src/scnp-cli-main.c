@@ -230,6 +230,38 @@ const notepad_device_T supported_devices[] = {
 
 
 static
+char *ludh_alloc_string_descriptor(libusb_device_handle *dev_handle,
+                                   const uint8_t index)
+    __attribute__(( nonnull(1), malloc, malloc(free, 1) ));
+
+static
+char *ludh_alloc_string_descriptor(libusb_device_handle *dev_handle,
+                                   const uint8_t index)
+{
+    if (index == 0) {
+        /* descriptor 0 is the language array */
+        return NULL;
+    }
+
+    unsigned char buf[1024];
+    const int luret_get_sd_ascii =
+        libusb_get_string_descriptor_ascii(dev_handle,
+                                           index,
+                                           buf,
+                                           sizeof(buf));
+    LIBUSB_OR_FAIL(luret_get_sd_ascii,
+                   "libusb_get_string_descriptor_ascii index");
+
+    char *ret = malloc(luret_get_sd_ascii+1);
+    COND_OR_FAIL(ret != NULL, "malloc OOM");
+
+    strncpy(ret, (char *)buf, luret_get_sd_ascii);
+
+    return ret;
+}
+
+
+static
 ssize_t supported_device_list(libusb_device ***device_list)
     __attribute__(( nonnull(1) ));
 
@@ -278,28 +310,28 @@ ssize_t supported_device_list(libusb_device ***device_list)
                 const uint8_t firmware_hi = (desc.bcdDevice >> 8) & 0xff;
                 const uint8_t firmware_lo = (desc.bcdDevice >> 0) & 0xff;
 
-                unsigned char buf_manufacturer[1024];
-                const int luret_get_sd_ascii_manuf =
-                    libusb_get_string_descriptor_ascii(dev_handle,
-                                                       desc.iManufacturer,
-                                                       buf_manufacturer,
-                                                       sizeof(buf_manufacturer));
-                LIBUSB_OR_FAIL(luret_get_sd_ascii_manuf,
-                               "libusb_get_string_descriptor_ascii iManufacturer");
+                char *buf_manufacturer = ludh_alloc_string_descriptor(dev_handle,
+                                                                      desc.iManufacturer);
+                char *buf_product      = ludh_alloc_string_descriptor(dev_handle,
+                                                                      desc.iProduct);
+                char *buf_serial       = ludh_alloc_string_descriptor(dev_handle,
+                                                                      desc.iSerialNumber);
 
-                unsigned char buf_product[1024];
-                const int luret_get_sd_ascii_prod =
-                    libusb_get_string_descriptor_ascii(dev_handle,
-                                                       desc.iProduct,
-                                                       buf_product,
-                                                       sizeof(buf_product));
-                LIBUSB_OR_FAIL(luret_get_sd_ascii_prod,
-                               "libusb_get_string_descriptor_ascii iProduct");
+                if (buf_serial) {
+                    printf("Bus %03d Device %03d: ID %04x:%04x %s %s (firmware %d.%02d, serial %s)\n",
+                           busnum, devaddr, desc.idVendor, desc.idProduct,
+                           buf_manufacturer, buf_product,
+                           firmware_hi, firmware_lo, buf_serial);
+                } else {
+                    printf("Bus %03d Device %03d: ID %04x:%04x %s %s (firmware %d.%02d)\n",
+                           busnum, devaddr, desc.idVendor, desc.idProduct,
+                           buf_manufacturer, buf_product,
+                           firmware_hi, firmware_lo);
+                }
 
-                printf("Bus %03d Device %03d: ID %04x:%04x %s %s (firmware %d.%02d)\n",
-                       busnum, devaddr, desc.idVendor, desc.idProduct,
-                       buf_manufacturer, buf_product,
-                       firmware_hi, firmware_lo);
+                free(buf_serial);
+                free(buf_product);
+                free(buf_manufacturer);
 
                 libusb_close(dev_handle);
 
