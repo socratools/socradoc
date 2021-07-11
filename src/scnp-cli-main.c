@@ -275,6 +275,9 @@ ssize_t supported_device_list(libusb_device ***device_list)
                     libusb_open(dev, &dev_handle);
                 LIBUSB_OR_FAIL(luret_open, "libusb_open");
 
+                const uint8_t firmware_hi = (desc.bcdDevice >> 8) & 0xff;
+                const uint8_t firmware_lo = (desc.bcdDevice >> 0) & 0xff;
+
                 unsigned char buf_manufacturer[1024];
                 const int luret_get_sd_ascii_manuf =
                     libusb_get_string_descriptor_ascii(dev_handle,
@@ -293,9 +296,10 @@ ssize_t supported_device_list(libusb_device ***device_list)
                 LIBUSB_OR_FAIL(luret_get_sd_ascii_prod,
                                "libusb_get_string_descriptor_ascii iProduct");
 
-                printf("Bus %03d Device %03d: ID %04x:%04x %s %s\n",
+                printf("Bus %03d Device %03d: ID %04x:%04x %s %s (firmware %d.%02d)\n",
                        busnum, devaddr, desc.idVendor, desc.idProduct,
-                       buf_manufacturer, buf_product);
+                       buf_manufacturer, buf_product,
+                       firmware_hi, firmware_lo);
 
                 libusb_close(dev_handle);
 
