@@ -11,6 +11,7 @@ check_PROGRAMS =
 check_SCRIPTS =
 BUILT_SOURCES =
 CLEANFILES =
+dist_doc_DATA =
 doc_DATA =
 EXTRA_DIST =
 man1_MANS =
