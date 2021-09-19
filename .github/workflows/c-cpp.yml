@@ -9,12 +9,22 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
 
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: install-software-linux
+      if: runner.os == 'Linux'
+      run: sudo apt install autopoint gettext
+    - name: install-software-macos
+      if: runner.os == 'macOS'
+      run: brew install automake
     - name: autoreconf
       run: autoreconf -vis .
     - name: configure
