@@ -232,7 +232,11 @@ const notepad_device_T supported_devices[] = {
 static
 char *ludh_alloc_string_descriptor(libusb_device_handle *dev_handle,
                                    const uint8_t index)
-    __attribute__(( nonnull(1), malloc, malloc(free, 1) ));
+    __attribute__(( nonnull(1), malloc
+#if (defined(__GNUC__) && (__GNUC__ >= 11))
+                    , malloc(free, 1)
+#endif
+                    ));
 
 static
 char *ludh_alloc_string_descriptor(libusb_device_handle *dev_handle,
