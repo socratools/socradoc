@@ -25,6 +25,9 @@ jobs:
     - name: install-software-macos
       if: runner.os == 'macOS'
       run: brew install automake libusb
+    - name: install-software-windows
+      if: runner.os == 'Windows'
+      run: choco install automake autoconf libusb
     - name: autoreconf
       run: autoreconf -vis .
     - name: configure
