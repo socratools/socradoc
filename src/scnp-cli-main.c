@@ -352,8 +352,12 @@ ssize_t supported_device_list(libusb_device ***device_list)
     ret_list[ret_count] = NULL;
 
     /* reduce the memory size to what we actually use */
-    ret_list = reallocarray(ret_list, ((size_t)ret_count)+1,
-                            sizeof(libusb_device *));
+    const size_t nmemb = ((size_t)ret_count)+1;
+    const size_t eltsize = sizeof(libusb_device *);
+    const size_t arrsize = nmemb * eltsize;
+    COND_OR_FAIL(((nmemb <= arrsize) && (eltsize <= arrsize)),
+                 "size_t multiplication overflow");
+    ret_list = realloc(ret_list, arrsize);
     COND_OR_FAIL(ret_list != NULL, "reallocarray");
 
     *device_list = ret_list;
