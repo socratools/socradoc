@@ -145,7 +145,8 @@ uint32_t dB_to_uint(const uint32_t ref_value, const double dB_value)
 
     const long long_uint_value = lround(d_uint_value);
     BE_LONG_OR_FAIL(0L, long_uint_value);
-    BE_LONG_OR_FAIL(long_uint_value, ref_value);
+    COND_OR_FAIL(ref_value < INT32_MAX, "ref_value must not overflow in an int32_t");
+    BE_LONG_OR_FAIL(long_uint_value, ((long)ref_value));
     const uint32_t retval = (uint32_t) long_uint_value;
     return retval;
 }
