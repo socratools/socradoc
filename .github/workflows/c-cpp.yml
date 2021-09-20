@@ -82,8 +82,16 @@ jobs:
           update: true
           install: >-
             git
-            base-devel
             tree
+            autoconf
+            automake
+            diffutils
+            # gettext-devel
+            # intltool
+            libtool
+            make
+            patchutils
+            pkgconf
             mingw-w64-${{ matrix.env }}-gcc
             mingw-w64-${{ matrix.env }}-libusb
 
