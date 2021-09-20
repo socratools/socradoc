@@ -60,6 +60,13 @@ jobs:
         shell: msys2 {0}
 
     steps:
+      - name: 'cmd shell environment info'
+        shell: cmd
+        run: |
+          path
+          echo %PATH%
+          set
+
       - name: 'git config'
         run:  git config --global core.autocrlf input
         shell: bash
