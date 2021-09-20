@@ -80,6 +80,12 @@ jobs:
             mingw-w64-${{ matrix.env }}-toolchain
             mingw-w64-${{ matrix.env }}-libusb
 
+      - name: '${{ matrix.sys }} environment info'
+        run: |
+          echo "PATH=$PATH"
+          which bash
+          which make
+
       - name: '${{ matrix.sys }} autoreconf'
         run: autoreconf -vis .
 
