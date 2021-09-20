@@ -78,6 +78,7 @@ jobs:
             base-devel
             tree
             mingw-w64-${{ matrix.env }}-toolchain
+            mingw-w64-${{ matrix.env }}-libusb
 
       - name: '${{ matrix.sys }} autoreconf'
         run: autoreconf -vis .
