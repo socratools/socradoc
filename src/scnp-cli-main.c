@@ -1129,10 +1129,6 @@ int parse_command_ducker_range(const char *const param_range)
             fprintf(stderr, "Fatal: Error converting number: below 0dB\n");
             return EXIT_FAILURE;
         }
-        if (lval > UINT32_MAX) {
-            fprintf(stderr, "Fatal: Error converting number: too large\n");
-            return EXIT_FAILURE;
-        }
         if (lval > 90) {
             fprintf(stderr, "Fatal: Error converting number: above 90dB\n");
             return EXIT_FAILURE;
@@ -1144,10 +1140,6 @@ int parse_command_ducker_range(const char *const param_range)
     } else if (*p == '\0') { /* integer without a unit */
         if (lval < 0) {
             fprintf(stderr, "Fatal: Error converting number: negative\n");
-            return EXIT_FAILURE;
-        }
-        if (lval > UINT32_MAX) {
-            fprintf(stderr, "Fatal: Error converting number: too large\n");
             return EXIT_FAILURE;
         }
         if (lval > 0x1fffffff) {
@@ -1206,10 +1198,6 @@ int parse_command_ducker_threshold(const char *const param_threshold)
     } else if (*p == '\0') { /* integer without a unit */
         if (lval < 0) {
             fprintf(stderr, "Fatal: Error converting number: negative\n");
-            return EXIT_FAILURE;
-        }
-        if (lval > UINT32_MAX) {
-            fprintf(stderr, "Fatal: Error converting number: too large\n");
             return EXIT_FAILURE;
         }
         if (lval > 0x1fffffff) {
