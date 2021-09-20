@@ -35,3 +35,68 @@ jobs:
       run: make check
     - name: make distcheck
       run: make distcheck
+
+  windows-build:
+    runs-on: windows-latest
+
+    # See https://github.com/msys2/setup-msys2
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { sys: mingw32, env: i686 }
+          - { sys: mingw64, env: x86_64 }
+          - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
+          - { sys: clang64, env: clang-x86_64 } # Experimental!
+
+    name: ${{ matrix.sys }} build
+
+    env:
+      MINGW_ARCH: ${{ matrix.sys }}
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: 'git config'
+        run:  git config --global core.autocrlf input
+        shell: bash
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: '${{ matrix.sys }} Setup MSYS2'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.sys }}
+          update: true
+          install: >-
+            git
+            base-devel
+            tree
+            mingw-w64-${{ matrix.env }}-toolchain
+
+      - name: '${{ matrix.sys }} autoreconf'
+        run: autoreconf -vis .
+
+      - name: '${{ matrix.sys }} configure'
+        run: ./configure
+
+      - name: '${{ matrix.sys }} make'
+        run: make
+
+      - name: '${{ matrix.sys }} make check'
+        run: make check
+
+      - name: '${{ matrix.sys }} make distcheck'
+        run: make distcheck
+
+      - name: '${{ matrix.sys }} dist tarball content'
+        run: |
+          mkdir tmp
+          cd tmp
+          tar -xf ../*.tar.*
+          tree .
