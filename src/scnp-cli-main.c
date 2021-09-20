@@ -256,10 +256,11 @@ char *ludh_alloc_string_descriptor(libusb_device_handle *dev_handle,
     LIBUSB_OR_FAIL(luret_get_sd_ascii,
                    "libusb_get_string_descriptor_ascii index");
 
-    char *ret = malloc(luret_get_sd_ascii+1);
+    const size_t size_t_get_sd_ascii = ((size_t) luret_get_sd_ascii);
+    char *ret = malloc(size_t_get_sd_ascii + 1);
     COND_OR_FAIL(ret != NULL, "malloc OOM");
 
-    strncpy(ret, (char *)buf, luret_get_sd_ascii);
+    strncpy(ret, (char *)buf, size_t_get_sd_ascii);
 
     return ret;
 }
