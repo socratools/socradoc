@@ -5,8 +5,8 @@ This document describes Soundcraft's Notepad series of mixers and how
 the USB protocol the **Soundcraft USB audio control panel** and the
 Soundcraft Notepad series mixer appears to work together.
 
-The information in this document is a summary of what could be
-observed, and makes no guarantees whatsoever regarding
+The information in this document summarizes what could be observed,
+and makes no guarantees whatsoever regarding
 
   * accuracy
   * applicability
@@ -103,8 +103,8 @@ any state. (Avoiding persistent state in the mixer device also makes
 sense from device design, user experience, and user support
 perspectives.)
 
-There might still be a few "query mixer state" USB command implemented
-in the mixer, but we have not observed their use yet.
+There might still be a few "query mixer state" USB commands
+implemented in the mixer, but we have not observed their use yet.
 
 
 Audio Routing
