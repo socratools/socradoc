@@ -281,6 +281,7 @@ char *ludh_alloc_string_descriptor(libusb_device_handle *dev_handle,
     COND_OR_FAIL(ret != NULL, "malloc OOM");
 
     strncpy(ret, (char *)buf, size_t_get_sd_ascii);
+    ret[size_t_get_sd_ascii] = '\0';
 
     return ret;
 }
