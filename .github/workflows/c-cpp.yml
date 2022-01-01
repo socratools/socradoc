@@ -86,8 +86,6 @@ jobs:
             autoconf
             automake
             diffutils
-            # gettext-devel
-            # intltool
             libtool
             make
             patchutils
