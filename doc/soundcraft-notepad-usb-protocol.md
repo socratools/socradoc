@@ -5,7 +5,7 @@ This document describes Soundcraft's Notepad series of mixers and how
 the USB protocol the **Soundcraft USB audio control panel** and the
 Soundcraft Notepad series mixer appears to work together.
 
-The information in this document is a summery of what could be
+The information in this document is a summary of what could be
 observed, and makes no guarantees whatsoever regarding
 
   * accuracy
@@ -90,12 +90,12 @@ When the mixer state is changed via USB commands, such as
 
   * non-default audio routing, the default being Mix L+R
   * enabled ducking
-  * enabled ducking with weird specific range and threshold values
+  * enabled ducking with non-default range and threshold values
 
 and the mixer is power cycled, the mixer sets its state to reasonable
 default values: audio routing is set to "Mix L+R", and ducking is off.
 
-If you then re-enable ducking with `ducker on/off` command, the range
+If you then re-enable ducking with a `ducker on/off` command, the range
 and threshold appear to have been reset to reasonable default values.
 
 This behaviour suggests that the mixer has no persistent storage for
@@ -103,7 +103,7 @@ any state. (Avoiding persistent state in the mixer device also makes
 sense from device design, user experience, and user support
 perspectives.)
 
-There might still be a few "quere mixer state" USB command implemented
+There might still be a few "query mixer state" USB command implemented
 in the mixer, but we have not observed their use yet.
 
 
@@ -119,7 +119,7 @@ routing` command.
 -----------------------
 
 Using the `audio routing` command, you can select which of the mixer's
-audio channel are routed to the USB capture device.
+audio channels are routed to the USB capture device.
 
 On the 2/2 channel USB capture devices Notepad-5 and Notepad-8FX, the
 two selected channels go to the two channels of the USB capture
@@ -172,7 +172,7 @@ The Notepad's ducker feature can duck the signal from the USB playback
 channels 1+2 (on the Notepad-12FX four channel USB playback device,
 USB playback channels 3+4 are not ducked) when it detects a signal on
 any combination of the so-called "input" channels which are the
-channels withc are going to the USB audio capture device.
+channels which are going to the USB audio capture device.
 
 The ducker is not mentioned at all in the user manual for the Notepad
 series of mixers, but it can be turned on and off and its parameters
@@ -181,7 +181,7 @@ Windows) software for the Notepad series.
 
 As the **Soundcraft USB audio control panel** only sends USB requests
 changing the settings of the ducker while the ducker is actually
-enabled, it appears be prudent to do the same in any software
+enabled, it appears to be prudent to do the same in any software
 implementing commands to Notepad series mixers.
 
 All ducker related commands appear to use the following format:
@@ -358,7 +358,7 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
                               observed range:
                                 * 0x0000008e .. 0x010007bd (stereo input)
                                 * 0x0000009e .. 0x00800000 (mono input)
-                                * continuously 0x00000000 while is ducker off
+                                * continuously 0x00000000 while ducker is off
 
     The unlabeled bytes have always been observed to be 0x00.
 
@@ -388,7 +388,7 @@ care needs to be taken to clamp the values to the applicable interval
 of numbers.
 
 Note that the meter feature only works while the ducker is enabled. If
-the ducker is *not* enabled, all meter responses will be all-0x00, so
+the ducker is *not* enabled, all meter responses will be all 0x00, so
 you will receive a `0x00000000` value for meter_uint which means the
 dB conversion function will compute the logarithm of `0` which will
 either compute as negative infinity, throw an exception, or similar.
