@@ -29,6 +29,15 @@ subdir-objects
 
 AC_CANONICAL_HOST
 
+AC_MSG_CHECKING([host_cpu])
+AC_MSG_RESULT([$host_cpu])
+
+AC_MSG_CHECKING([host_os])
+AC_MSG_RESULT([$host_os])
+
+AC_MSG_CHECKING([host_vendor])
+AC_MSG_RESULT([$host_vendor])
+
 
 ########################################################################
 # Checks for programs.
