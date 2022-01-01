@@ -105,6 +105,11 @@ AC_MSG_RESULT([$bashcompletiondir])
 # Checks for header files.
 ########################################################################
 
+dnl We need windows.h on Windows for the Sleep(milliseconds) function
+AC_CHECK_HEADER([windows.h],
+                [AC_DEFINE([HAVE_WINDOWS_H], [1],
+                           [Define to 1 if you have <windows.h>])])
+
 
 ########################################################################
 # Checks for typedefs, structures, and compiler characteristics.
