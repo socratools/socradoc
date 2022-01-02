@@ -310,7 +310,7 @@ ssize_t supported_device_list(libusb_device ***device_list)
             if ((0x05fc == desc.idVendor) &&
                 (np_dev->idProduct == desc.idProduct)) {
 
-                const uint8_t busnum = libusb_get_bus_number(dev);
+                const uint8_t busnum  = libusb_get_bus_number(dev);
                 const uint8_t devaddr = libusb_get_device_address(dev);
 
                 libusb_device_handle *dev_handle;
@@ -359,7 +359,7 @@ ssize_t supported_device_list(libusb_device ***device_list)
     ret_list[ret_count] = NULL;
 
     /* reduce the memory size to what we actually use */
-    const size_t nmemb = ((size_t)ret_count)+1;
+    const size_t nmemb   = ((size_t)ret_count)+1;
     const size_t eltsize = sizeof(libusb_device *);
     const size_t arrsize = nmemb * eltsize;
     COND_OR_FAIL(((nmemb <= arrsize) && (eltsize <= arrsize)),
@@ -385,7 +385,6 @@ const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct)
     }
     return NULL;
 }
-
 
 
 static
@@ -685,10 +684,10 @@ void usbdev_meter(usbdev_T *usbdev)
 
 
         /* original dB value can be slightly outside the -100.0 .. 0.0 range */
-        const double raw_dB = uint_to_dB_meter(cur_value);
+        const double raw_dB  = uint_to_dB_meter(cur_value);
         const double raw_dB1 = (raw_dB < -100.0) ? -100.0 : raw_dB;
         /* dB value constrained into -100.0 to 0.0 interval */
-        const double dB = (raw_dB1 > 0.0) ? 0.0 : raw_dB1;
+        const double dB      = (raw_dB1 > 0.0) ? 0.0 : raw_dB1;
 
         if (raw_dB < min_double) {
             min_double = raw_dB;
@@ -732,6 +731,7 @@ void usbdev_meter(usbdev_T *usbdev)
            "minimum", min_value, min_value, min_double,
            "maximum", max_value, max_value, max_double);
 }
+
 
 typedef union {
     struct {
