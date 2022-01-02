@@ -7,6 +7,7 @@ scnp_cli_CFLAGS    = $(AM_CFLAGS)
 scnp_cli_LDADD     = $(AM_LDADD)
 scnp_cli_SOURCES   =
 
+scnp_cli_SOURCES  += %reldir%/milli_sleep.c
 scnp_cli_SOURCES  += %reldir%/scnp-cli-main.c
 
 # for reallocarray(3)

@@ -118,6 +118,12 @@ dnl We need windows.h on Windows for the Sleep(milliseconds) function
 AC_CHECK_HEADER([windows.h],
                 [AC_DEFINE([HAVE_WINDOWS_H], [1],
                            [Define to 1 if you have <windows.h>])])
+dnl We need time.h on POSIX for the
+dnl    int nanosleep(const struct timespec *req, struct timespec *rem)
+dnl function.
+AC_CHECK_HEADER([time.h],
+                [AC_DEFINE([HAVE_TIME_H], [1],
+                           [Define to 1 if you have <time.h> with POSOX nanosleep()])])
 
 
 ########################################################################

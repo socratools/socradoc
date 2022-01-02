@@ -43,27 +43,10 @@
 
 #include <libusb.h>
 
-#ifdef HAVE_WINDOWS_H
-# include <windows.h>
-#else
-# include <time.h>
-#endif
-
 
 #include "auto-config.h"
 
-
-static inline
-void millisecond_sleep(unsigned int milliseconds)
-{
-#ifdef HAVE_WINDOWS_H
-    Sleep(milliseconds);
-#else
-    const struct timespec req = { 0L, milliseconds*1000L*1000L };
-    struct timespec rem;
-    (void) nanosleep(&req, &rem);
-#endif
-}
+#include "milli_sleep.h"
 
 
 static
@@ -726,7 +709,7 @@ void usbdev_meter(usbdev_T *usbdev)
         printf("%07x %6.1f %s\r", cur_value, dB, meterbuf);
         fflush(stdout);
 
-        millisecond_sleep(100UL);
+        milli_sleep(100UL);
 
         if (global_abort) {
             /* When Ctrl-C has been pressed, re-print the meter line
