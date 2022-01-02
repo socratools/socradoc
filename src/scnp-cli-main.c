@@ -365,7 +365,7 @@ ssize_t supported_device_list(libusb_device ***device_list)
     COND_OR_FAIL(((nmemb <= arrsize) && (eltsize <= arrsize)),
                  "size_t multiplication overflow");
     ret_list = realloc(ret_list, arrsize);
-    COND_OR_FAIL(ret_list != NULL, "reallocarray");
+    COND_OR_FAIL(ret_list != NULL, "realloc");
 
     *device_list = ret_list;
     return ret_count;
