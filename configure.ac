@@ -13,16 +13,16 @@ AC_CONFIG_MACRO_DIR([auto-m4])
 AC_CONFIG_SRCDIR([src/scnp-cli-main.c])
 AC_CONFIG_HEADERS([include/auto-config.h])
 AM_INIT_AUTOMAKE([
-1.16
--Wall
--Werror
-foreign
-dist-xz
-no-dist-gzip
-filename-length-max=99
-no-define
-std-options
-subdir-objects
+  1.16
+  -Wall
+  -Werror
+  foreign
+  dist-xz
+  no-dist-gzip
+  filename-length-max=99
+  no-define
+  std-options
+  subdir-objects
 ])
 
 ########################################################################
