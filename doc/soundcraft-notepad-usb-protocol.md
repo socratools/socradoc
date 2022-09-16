@@ -1,9 +1,9 @@
 The Soundcraft Notepad USB protocol
 ===================================
 
-This document describes Soundcraft's Notepad series of mixers and how
-the USB protocol the **Soundcraft USB audio control panel** and the
-Soundcraft Notepad series mixer appears to work together.
+This document describes the Soundcraft's Notepad series of mixers and
+how the USB protocol between the **Soundcraft USB audio control panel**
+and the Soundcraft Notepad series mixer appears to work.
 
 The information in this document summarizes what could be observed,
 and makes no guarantees whatsoever regarding
@@ -29,12 +29,13 @@ According to a Soundcraft press release from Harman Professional from
 January 24, 2018, the 1.09 firmware version has introduced the Ducker
 feature for all three devices in the Notepad series.
 
-Soundcraft provides the **Soundcraft USB audio control panel** which
-allows changing the mixer settings for audio routing and the
-ducker. However, that software is only available in binary form for
-Windows and MacOS X, and the documentation provided by Soundcraft
-provides no description of the USB protocol the **Soundcraft USB audio
-control panel** uses to communicate with the mixer devices.
+Soundcraft provides the **Soundcraft USB audio control panel**
+software which allows changing the mixer settings for audio routing
+and the ducker. However, that software is only available in binary
+form for Windows and MacOS X, and the documentation provided by
+Soundcraft provides no description of the USB protocol the
+**Soundcraft USB audio control panel** uses to communicate with the
+mixer devices.
 
 
 General packet format
@@ -50,7 +51,7 @@ requests we have observed all have the following properties:
          0     wValue
          0     wIndex
 
-    sends 8 byte command data buffer
+    send a 8 byte command data buffer in the format
 
      0  1  2  3  4  5  6  7
     00 00 02 81 00 00 4a 67
