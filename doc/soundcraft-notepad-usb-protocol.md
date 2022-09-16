@@ -132,7 +132,8 @@ MIC 1 + MIC 2.
      0  1  2  3  4  5  6  7
     00 00 04 00 00 00 00 00
           ┗┩    ┗┩
-           │     └─────────── index into source table (range 0x00..0x03)
+           │     └─────────── index (range 0x00..0x03) into device
+           │                  model specific source table
            └───────────────── 0x04 = audio routing command
 
     The unlabeled bytes have always been observed to be 0x00.
