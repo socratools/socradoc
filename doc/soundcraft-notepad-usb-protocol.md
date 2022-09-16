@@ -323,6 +323,8 @@ With the inverse function mapping dB values to integer values being
     thresh_uint = 0x007fffff * 10
 
 TODO: What is a reasonable dB threshold value a GUI could start with?
+      Setting the threshold to -30dB behaves very similarly to the
+      default threshold.
 
 ### calculated value table for ducker threshold ###
 
