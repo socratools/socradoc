@@ -160,9 +160,9 @@ Table of possible audio sources for the Notepad-12FX:
     2         LINE 7/8         Stereo input 7+8
     3         MASTER L+R       Mix L+R
 
-The `audio routing` command been tested to work with `scnp-cli` for
-the Notepad-12FX, and with `socranop` for Notepad-5, Notepad-8FX. and
-Notepad-12FX.
+The `audio routing` command has been tested to work with `scnp-cli`
+for the Notepad-12FX, and with `socranop` for Notepad-5, Notepad-8FX,
+and Notepad-12FX.
 
 
 Ducker
