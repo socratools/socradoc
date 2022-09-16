@@ -56,9 +56,9 @@ requests we have observed all have the following properties:
      0  1  2  3  4  5  6  7
     00 00 02 81 00 00 4a 67
           ┗┩ ┗┩ ┗━━━━━━━━━┩
-           │  │           └── parameter(s) for the specific command
-           │  └────────────── command within command category
-           └───────────────── command category
+           │  │           ╰── parameter(s) for the specific command
+           │  ╰────────────── command within command category
+           ╰───────────────── command category
 
 To receive the meter value, a very similar USB Control IN transfer is
 used to receive 8 bytes of data:
@@ -132,9 +132,9 @@ MIC 1 + MIC 2.
      0  1  2  3  4  5  6  7
     00 00 04 00 00 00 00 00
           ┗┩    ┗┩
-           │     └─────────── index (range 0x00..0x03) into device
+           │     ╰─────────── index (range 0x00..0x03) into device
            │                  model specific source table
-           └───────────────── 0x04 = audio routing command
+           ╰───────────────── 0x04 = audio routing command
 
     The unlabeled bytes have always been observed to be 0x00.
 
@@ -191,9 +191,9 @@ All ducker related commands appear to use the following format:
      0  1  2  3  4  5  6  7
     00 00 02 cc xx xx xx xx
           ┗┩ ┗┩ ┗━━━━━━━━━┩
-           │  │           └── command specific parameters
-           │  └────────────── ducker command (0x80, 0x81, 0x82)
-           └───────────────── 0x02 = ducker related command
+           │  │           ╰── command specific parameters
+           │  ╰────────────── ducker command (0x80, 0x81, 0x82)
+           ╰───────────────── 0x02 = ducker related command
 
     The unlabeled bytes have always been observed to be 0x00.
 
@@ -208,12 +208,12 @@ observe, and the ducker's release time:
      0  1  2  3  4  5  6  7
     00 00 02 80 01 01 0c 15
           ┗┩ ┗┩ ┗┩ ┗┩ ┗━━━┩
-           │  │  │  │     └── release value in ms (network endian)
+           │  │  │  │     ╰── release value in ms (network endian)
            │  │  │  │         (observed range is 0..5000)
-           │  │  │  └──────── bits[3..0] are INPUT[4..1] enable bitfield
-           │  │  └─────────── 0x01 = enable ducker, 0x00 disable ducker
-           │  └────────────── 0x80 = ducker on/off command
-           └───────────────── 0x02 = ducker related command
+           │  │  │  ╰──────── bits[3..0] are INPUT[4..1] enable bitfield
+           │  │  ╰─────────── 0x01 = enable ducker, 0x00 disable ducker
+           │  ╰────────────── 0x80 = ducker on/off command
+           ╰───────────────── 0x02 = ducker related command
 
     The unlabeled bytes have always been observed to be 0x00.
 
@@ -253,26 +253,26 @@ CONTROL OUT message with endpoint 0 setting the "duck range":
      0  1  2  3  4  5  6  7
     00 00 02 81 00 00 4a 67
           ┗┩ ┗┩ ┗━━━━━━━━━┩
-           │  │           └── network endian "duck range" value
+           │  │           ╰── network endian "duck range" value
            │  │               observed range is 0x1fff_ffff to 0x0000_4a67
            │  │               corresponding to displayed values of 0dB to 90dB
-           │  └────────────── 0x81 = ducker range command
-           └───────────────── 0x02 = ducker related command
+           │  ╰────────────── 0x81 = ducker range command
+           ╰───────────────── 0x02 = ducker related command
 
     The unlabeled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
 
-                             /  range_uint  \
-    range_dB = - 20 * log10 |  ------------  |
-                             \  0x1fffffff  /
+                            ╭  range_uint  ╮
+    range_dB = - 20 * log10 │ ──────────── │
+                            ╰  0x1fffffff  ╯
 
 With the inverse function mapping dB values to integer values being
 
-                                 /  -range_dB  \
-                                |  -----------  |
-                                 \      20     /
+                                ╭  -range_dB  ╮
+                                │ ─────────── │
+                                ╰      20     ╯
     range_uint = 0x1fffffff * 10
 
 TODO: What is a reasonable dB range value a GUI could start with?
@@ -300,26 +300,26 @@ CONTROL OUT message with endpoint 0 setting the "threshold":
      0  1  2  3  4  5  6  7
     00 00 02 82 00 7f ff ff
           ┗┩ ┗┩ ┗━━━━━━━━━┩
-           │  │           └── network endian threshold value
+           │  │           ╰── network endian threshold value
            │  │               observed range is 0x20c3=8387 to 0x7fffff=8388607
            │  │               corresponding to displayed values of -60dB to 0dB
-           │  └────────────── 0x82 = ducker threshold command
-           └───────────────── 0x02 = ducker related command
+           │  ╰────────────── 0x82 = ducker threshold command
+           ╰───────────────── 0x02 = ducker related command
 
     The unlabeled bytes have always been observed to be 0x00.
 
 To map the integer values to dB values, the following equation looks
 plausible:
 
-                            /  thresh_uint  \
-    thresh_dB = 20 * log10 |  -------------  |
-                            \   0x007fffff  /
+                           ╭  thresh_uint  ╮
+    thresh_dB = 20 * log10 │ ───────────── │
+                           ╰  0x007fffff   ╯
 
 With the inverse function mapping dB values to integer values being
 
-                                 /  thresh_dB  \
-                                |  -----------  |
-                                 \      20     /
+                                 ╭  thresh_dB  ╮
+                                 │ ─────────── │
+                                 ╰      20     ╯
     thresh_uint = 0x007fffff * 10
 
 TODO: What is a reasonable dB threshold value a GUI could start with?
@@ -356,7 +356,7 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
      0  1  2  3  4  5  6  7
     bd 07 00 01 00 00 00 00
     ┗━━━━━━━━━┩
-              └────────────── meter value in LITTLE ENDIAN!
+              ╰────────────── meter value in LITTLE ENDIAN!
                               observed range:
                                 * 0x0000008e .. 0x010007bd (stereo input)
                                 * 0x0000009e .. 0x00800000 (mono input)
@@ -367,17 +367,17 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
 To map the integer values to dB values, the following equation looks
 plausible:
 
-                           /  meter_uint  \
-    meter_dB = 20 * log10 |  ------------  |
-                           \  0x01000000  /
+                          ╭  meter_uint  ╮
+    meter_dB = 20 * log10 │ ──────────── │
+                          ╰  0x01000000  ╯
 
 TODO: Need confirmation from GUI of meter range in uint32 and dB.
 
 With the inverse function mapping dB values to integer values being
 
-                                 /  meter_dB  \
-                                |  ----------  |
-                                 \     20     /
+                                ╭  meter_dB  ╮
+                                │ ────────── │
+                                ╰     20     ╯
     meter_uint = 0x01000000 * 10
 
 For an integer range of `0x8e` .. `0x010007bd`, this corresponds to
