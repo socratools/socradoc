@@ -21,7 +21,7 @@ jobs:
         fetch-depth: 0
     - name: install-software-linux
       if: runner.os == 'Linux'
-      run: sudo apt install autoconf automake autopoint gettext libusb-1.0-0-dev
+      run: sudo apt-get install autoconf automake autopoint gettext libusb-1.0-0-dev
     - name: install-software-macos
       if: runner.os == 'macOS'
       run: brew install autoconf automake libusb
