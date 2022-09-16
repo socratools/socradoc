@@ -42,8 +42,10 @@
 #include "auto-config.h"
 
 
-#if HAVE_LOCALE_RELATED_HEADERS
+#if HAVE_LANGINFO_H
 #include <langinfo.h>
+#endif
+#if HAVE_LOCALE_H
 #include <locale.h>
 #endif
 
@@ -69,7 +71,7 @@ output_charset_T output_charset = CHARSET_ASCII;
 
 
 void detect_output_charset(void) {
-#if HAVE_LOCALE_RELATED_HEADERS
+#if (defined(HAVE_LANGINFO_H) && defined(HAVE_LOCALE_H))
     setlocale(LC_CTYPE, "");
     const char *const codeset = nl_langinfo(CODESET);
     if (codeset) {

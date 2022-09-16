@@ -128,9 +128,7 @@ AC_CHECK_HEADER([time.h],
 
 dnl If langinfo.h and locale.h are available, we can detect whether we
 dnl can output utf-8 strings.
-AC_CHECK_HEADERS([langinfo.h locale.h],
-                 [AC_DEFINE([HAVE_LOCALE_RELATED_HEADERS], [1],
-                            [Define to 1 if langinfo.h and locale.h are present])])
+AC_CHECK_HEADERS([langinfo.h locale.h])
 
 
 ########################################################################
