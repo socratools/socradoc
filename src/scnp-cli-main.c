@@ -39,6 +39,14 @@
 #include <string.h>
 
 
+#include "auto-config.h"
+
+
+#if HAVE_LOCALE_RELATED_HEADERS
+#include <langinfo.h>
+#include <locale.h>
+#endif
+
 #include <signal.h>
 #include <unistd.h>
 
@@ -46,9 +54,34 @@
 #include <libusb.h>
 
 
-#include "auto-config.h"
-
 #include "milli_sleep.h"
+
+
+typedef enum {
+    CHARSET_ASCII,
+    CHARSET_UTF8,
+} output_charset_T;
+
+
+/* Use enum type to allow compiler warnings on unhandled case. */
+static
+output_charset_T output_charset = CHARSET_ASCII;
+
+
+void detect_output_charset(void) {
+#if HAVE_LOCALE_RELATED_HEADERS
+    setlocale(LC_CTYPE, "");
+    const char *const codeset = nl_langinfo(CODESET);
+    if (codeset) {
+        printf("codeset: %s\n", codeset);
+    } else {
+        printf("codeset: <none>\n");
+    }
+    if (0 == strcmp("UTF-8", codeset)) {
+        output_charset = CHARSET_UTF8;
+    }
+#endif
+}
 
 
 static
@@ -649,20 +682,15 @@ void usbdev_meter(usbdev_T *usbdev)
     double min_double = +DBL_MAX;
     double max_double = -DBL_MAX;
 
-    /* We could use unicode block characters. We could use ANSI
-     * colors. But unicode block characters might not be
-     * available. ANSI colors might not be. termcap is complex. And we
-     * are lazy. */
+    /* We could use ANSI colors which might not be available. We could
+     * determine the terminal width. termcap is complex. And we are
+     * lazy. */
 
 #define METER_WIDTH 63UL
 
-    static char meterbuf[76];
-    for (size_t i=1; i<1+METER_WIDTH; ++i) {
-        meterbuf[i] = '-';
-    }
-    meterbuf[0] = '[';
-    meterbuf[1+METER_WIDTH] = ']';
-    meterbuf[2+METER_WIDTH] = '\0';
+    /* worst case: utf-8 with 3 bytes/character */
+    char meterbuf[3*76];
+    meterbuf[0] = '\0'; /* should be overwritten, but make certain */
 
     signal(SIGINT, handle_signal);
 
@@ -682,7 +710,6 @@ void usbdev_meter(usbdev_T *usbdev)
             max_value = cur_value;
         }
 
-
         /* original dB value can be slightly outside the -100.0 .. 0.0 range */
         const double raw_dB  = uint_to_dB_meter(cur_value);
         const double raw_dB1 = (raw_dB < -100.0) ? -100.0 : raw_dB;
@@ -696,16 +723,54 @@ void usbdev_meter(usbdev_T *usbdev)
             max_double = raw_dB;
         }
 
-        const double d_idx = ((100.0 + dB) * METER_WIDTH) * 0.01;
-        const uint32_t idx = (uint32_t) d_idx;
+        /* Times 8 because of eighths granularity in the UTF-8 meter. */
+        const double d_idx8tms = ((100.0 + dB) * METER_WIDTH) * 0.01 * 8;
+        const uint32_t idx8tms = (uint32_t) d_idx8tms;
+        const uint32_t idx_int = idx8tms / 8;
+        const uint32_t idx_8th = idx8tms % 8;
+        COND_OR_FAIL(idx_int <= METER_WIDTH, "value range exceeded");
 
-        COND_OR_FAIL(idx <= METER_WIDTH, "value range exceeded");
-
-        for (size_t i=1; i<1+idx; ++i) {
-            meterbuf[i] = '#';
-        }
-        for (size_t i=1+idx; i<1+METER_WIDTH; ++i) {
-            meterbuf[i] = '-';
+        char *dst = meterbuf;
+        switch (output_charset) {
+        case CHARSET_ASCII:
+            /* produce a meterbuf string like "[#####---]" */
+            *dst++ = '[';
+            for (size_t i=1; i<1+idx_int; ++i) {
+                *dst++ = '#';
+            }
+            for (size_t i=1+idx_int; i<1+METER_WIDTH; ++i) {
+                *dst++ = '-';
+            }
+            *dst++ = ']';
+            *dst++ = '\0';
+            break;
+        case CHARSET_UTF8:
+            /* produce a meterbuf string like " █████▌  " */
+            *dst++ = ' ';
+            for (size_t i=1; i<1+idx_int; ++i) {
+                for (char *src="█"; *src; ++src) {
+                    *dst++ = *src;
+                }
+            }
+            static const char *const eighths_blocks[] = {
+                " ", /* [0] SPACE */
+                "▏", /* [1] LEFT ONE EIGHTH BLOCK */
+                "▎", /* [2] LEFT ONE QUARTER BLOCK */
+                "▍", /* [3] LEFT THREE EIGHTHS BLOCK */
+                "▌", /* [4] LEFT HALF BLOCK */
+                "▋", /* [5] LEFT FIVE EIGHTHS BLOCK */
+                "▊", /* [6] LEFT THREE QUARTERS BLOCK */
+                "▉", /* [7] LEFT SEVEN EIGHTHS BLOCK */
+                "█", /* [8] FULL BLOCK */
+            };
+            for (const char *src=eighths_blocks[idx_8th]; *src; ++src) {
+                *dst++ = *src;
+            }
+            for (size_t i=2+idx_int; i<1+METER_WIDTH; ++i) {
+                *dst++ = ' ';
+            }
+            *dst++ = '\0';
+            break;
         }
         printf("%07x %6.1f %s\r", cur_value, dB, meterbuf);
         fflush(stdout);
@@ -716,6 +781,9 @@ void usbdev_meter(usbdev_T *usbdev)
             /* When Ctrl-C has been pressed, re-print the meter line
              * to overwrite the "^C" shown at the beginning of the
              * line before leaving the loop.
+             *
+             * Only put this after cur_value, dB, and meterbuf have
+             * been filled with useful values.
              */
             printf("\r%07x %6.1f %s  \r", cur_value, dB, meterbuf);
             fflush(stdout);
@@ -1333,6 +1401,7 @@ int parse_cmdline(const int argc, const char *const argv[])
 
 int main(const int argc, const char *const argv[])
 {
+    detect_output_charset();
     const char *const env_scnp_cli_dry_run = getenv("SCNP_CLI_DRY_RUN");
     if (env_scnp_cli_dry_run && (*env_scnp_cli_dry_run != '\0')) {
         dry_run = true;
