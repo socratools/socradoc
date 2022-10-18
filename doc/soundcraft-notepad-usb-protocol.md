@@ -276,6 +276,7 @@ With the inverse function mapping dB values to integer values being
     range_uint = 0x1fffffff * 10
 
 TODO: What is a reasonable dB range value a GUI could start with?
+      Preliminary listening results suggest something like 10..12dB.
 
 ### calculated value table for duck range ###
 
