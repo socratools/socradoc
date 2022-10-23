@@ -353,8 +353,9 @@ ssize_t supported_device_list(libusb_device ***device_list)
                     libusb_open(dev, &dev_handle);
                 LIBUSB_OR_FAIL(luret_open, "libusb_open");
 
-                const uint8_t firmware_hi = (desc.bcdDevice >> 8) & 0xff;
-                const uint8_t firmware_lo = (desc.bcdDevice >> 0) & 0xff;
+                const uint8_t version_maj = (desc.bcdDevice >> 8) & 0xff;
+                const uint8_t version_min = (desc.bcdDevice >> 4) & 0x0f;
+                const uint8_t version_sub = (desc.bcdDevice >> 0) & 0x0f;
 
                 char *buf_manufacturer = ludh_alloc_string_descriptor(dev_handle,
                                                                       desc.iManufacturer);
@@ -364,15 +365,16 @@ ssize_t supported_device_list(libusb_device ***device_list)
                                                                       desc.iSerialNumber);
 
                 if (buf_serial) {
-                    printf("Bus %03d Device %03d: ID %04x:%04x %s %s (firmware %d.%02d, serial %s)\n",
+                    printf("Bus %03d Device %03d: ID %04x:%04x %s %s (version %d.%d.%d, serial %s)\n",
                            busnum, devaddr, desc.idVendor, desc.idProduct,
                            buf_manufacturer, buf_product,
-                           firmware_hi, firmware_lo, buf_serial);
+                           version_maj, version_min, version_sub,
+                           buf_serial);
                 } else {
-                    printf("Bus %03d Device %03d: ID %04x:%04x %s %s (firmware %d.%02d)\n",
+                    printf("Bus %03d Device %03d: ID %04x:%04x %s %s (version %d.%d.%d)\n",
                            busnum, devaddr, desc.idVendor, desc.idProduct,
                            buf_manufacturer, buf_product,
-                           firmware_hi, firmware_lo);
+                           version_maj, version_min, version_sub);
                 }
 
                 free(buf_serial);
