@@ -480,8 +480,9 @@ void device_send_ctrl_message(libusb_device_handle *device_handle,
     const uint16_t u16_data_size = (uint16_t) data_size;
 
     COND_OR_FAIL(data_size == 8, "all known notepad messages are 8 bytes");
-    printf("device_send_ctrl_message(device,"
+    printf("sending %d-byte buffer"
            " {%02x %02x %02x %02x %02x %02x %02x %02x})%s\n",
+           u16_data_size,
            data[0], data[1], data[2], data[3],
            data[4], data[5], data[6], data[7],
            dry_run?" (dry-run)":"");
