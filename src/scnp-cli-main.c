@@ -74,12 +74,7 @@ void detect_output_charset(void) {
 #if (defined(HAVE_LANGINFO_H) && defined(HAVE_LOCALE_H))
     setlocale(LC_CTYPE, "");
     const char *const codeset = nl_langinfo(CODESET);
-    if (codeset) {
-        printf("codeset: %s\n", codeset);
-    } else {
-        printf("codeset: <none>\n");
-    }
-    if (0 == strcmp("UTF-8", codeset)) {
+    if (codeset && (0 == strcmp("UTF-8", codeset))) {
         output_charset = CHARSET_UTF8;
     }
 #endif
