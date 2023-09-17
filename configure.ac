@@ -208,17 +208,22 @@ AC_OUTPUT
 # Human readable (maybe even user readable!) summary
 ########################################################################
 
+my_builddir="$(pwd)"
+
 cat<<EOF
 
 Configuration:
   Package: $PACKAGE_TARNAME ($PACKAGE_NAME)
   Version: $PACKAGE_VERSION
 
-  srcdir: $srcdir
+  builddir: $my_builddir
+  srcdir:   $srcdir
 
   CC:     $CC
   prefix: $prefix
   bindir: $bindir
+
+  PEDANTIC_C11_CFLAGS: $PEDANTIC_C11_CFLAGS
 
 You may run "make" and "make install" now.
 EOF
