@@ -454,7 +454,7 @@ void device_recv_ctrl_message(libusb_device_handle *device_handle,
                                     data, u16_data_size,
                                     10000 /* timeout in ms */);
         LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
-        COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
+        COND_OR_FAIL(((size_t) luret_ctrl_transfer) == data_size,
                      "libusb_control_transfer");
     }
 
@@ -501,7 +501,7 @@ void device_send_ctrl_message(libusb_device_handle *device_handle,
                                 data, u16_data_size,
                                 10000 /* timeout in ms */);
     LIBUSB_OR_FAIL(luret_ctrl_transfer, "libusb_control_transfer");
-    COND_OR_FAIL(luret_ctrl_transfer == sizeof(data),
+    COND_OR_FAIL(((size_t) luret_ctrl_transfer) == data_size,
                  "libusb_control_transfer");
 }
 
