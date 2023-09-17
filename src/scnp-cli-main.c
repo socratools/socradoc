@@ -70,6 +70,7 @@ static
 output_charset_T output_charset = CHARSET_ASCII;
 
 
+static
 void detect_output_charset(void) {
 #if (defined(HAVE_LANGINFO_H) && defined(HAVE_LOCALE_H))
     setlocale(LC_CTYPE, "");
