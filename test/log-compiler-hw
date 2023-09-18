@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# If hardware device is present and the permissions are such that we
+# can access the device, run the test on actual hardware. Serialize
+# access to the hardware via the test-hw.lock directory.
+#
+# Otherwise, we skip this test. Doing a dry-run would require a bit of
+# a rewrite of the device detection code to not detect devices.
+
+if (lsusb -d 05fc:0032 || lsusb -d 05fc:0031 || lsusb -d 05fc:0030) && ${SCNP_CLI-scnp-cli} check-permissions
+then
+    while :
+    do
+        if mkdir test-hw.lock
+        then
+            trap "rmdir test-hw.lock" 0
+            break
+        fi
+        sleep 2
+    done
+    "$@"
+else
+    # SCNP_CLI_DRY_RUN='yes'
+    # export SCNP_CLI_DRY_RUN
+    # set -e
+    # "$@"
+    exit 77
+fi

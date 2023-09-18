@@ -1,0 +1,5 @@
+#!/bin/sh
+
+${SCNP_CLI-scnp-cli} ducker-threshold -30dB
+${SCNP_CLI-scnp-cli} ducker-range 12dB
+${SCNP_CLI-scnp-cli} ducker-off
