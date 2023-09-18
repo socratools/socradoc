@@ -1,6 +1,5 @@
 # -*- makefile -*-
 
-
 AM_TESTS_ENVIRONMENT =
 
 # Run all tests without i18n and l10n for proper comparisons
@@ -8,98 +7,111 @@ AM_TESTS_ENVIRONMENT += LC_ALL='C'; export LC_ALL;
 
 # Some variables needed in test case scripts
 AM_TESTS_ENVIRONMENT += SCNP_CLI='$(abs_top_builddir)/scnp-cli'; export SCNP_CLI;
-AM_TESTS_ENVIRONMENT += SCNP_CLI_DRY_RUN='yes'; export SCNP_CLI_DRY_RUN;
+
+TEST_EXTENSIONS =
+
+# Tests which can use actual hardware
+TEST_EXTENSIONS += .hw
+EXTRA_DIST      += %reldir%/log-compiler-hw
+HW_LOG_COMPILER  = $(srcdir)/%reldir%/log-compiler-hw
+AM_HW_LOG_FLAGS  =
+
+# Tests which never use actual hardware
+TEST_EXTENSIONS   += .nohw
+EXTRA_DIST        += %reldir%/log-compiler-nohw
+NOHW_LOG_COMPILER  = $(srcdir)/%reldir%/log-compiler-nohw
+AM_NOHW_LOG_FLAGS  =
 
 
 # This might not work when cross-compiling.
 check_PROGRAMS += scnp-cli
 
-EXTRA_DIST  += %reldir%/scnp-cli--help.sh
-TESTS       += %reldir%/scnp-cli--help.sh
+EXTRA_DIST  += %reldir%/scnp-cli--help.nohw
+TESTS       += %reldir%/scnp-cli--help.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli--version.sh
-TESTS       += %reldir%/scnp-cli--version.sh
+EXTRA_DIST  += %reldir%/scnp-cli--version.nohw
+TESTS       += %reldir%/scnp-cli--version.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_no-arguments.sh
-TESTS       += %reldir%/scnp-cli_no-arguments.sh
-XFAIL_TESTS += %reldir%/scnp-cli_no-arguments.sh
+EXTRA_DIST  += %reldir%/scnp-cli_no-arguments.nohw
+TESTS       += %reldir%/scnp-cli_no-arguments.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_no-arguments.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_unknown.sh
-TESTS       += %reldir%/scnp-cli_unknown.sh
-XFAIL_TESTS += %reldir%/scnp-cli_unknown.sh
+EXTRA_DIST  += %reldir%/scnp-cli_unknown.nohw
+TESTS       += %reldir%/scnp-cli_unknown.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_unknown.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_-1.sh
-TESTS       += %reldir%/scnp-cli_audio-routing_-1.sh
-XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_-1.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_-1.nohw
+TESTS       += %reldir%/scnp-cli_audio-routing_-1.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_-1.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_4.sh
-TESTS       += %reldir%/scnp-cli_audio-routing_4.sh
-XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_4.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_4.nohw
+TESTS       += %reldir%/scnp-cli_audio-routing_4.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_4.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_emptystr.sh
-TESTS       += %reldir%/scnp-cli_audio-routing_emptystr.sh
-XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_emptystr.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_emptystr.nohw
+TESTS       += %reldir%/scnp-cli_audio-routing_emptystr.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_emptystr.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.sh
-TESTS       += %reldir%/scnp-cli_audio-routing_nothing.sh
-XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_nothing.nohw
+TESTS       += %reldir%/scnp-cli_audio-routing_nothing.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_audio-routing_nothing.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_0.sh
-TESTS       += %reldir%/scnp-cli_audio-routing_0.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_0.hw
+TESTS       += %reldir%/scnp-cli_audio-routing_0.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.sh
-TESTS       += %reldir%/scnp-cli_audio-routing_3.sh
+EXTRA_DIST  += %reldir%/scnp-cli_audio-routing_3.hw
+TESTS       += %reldir%/scnp-cli_audio-routing_3.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-off.sh
-TESTS       += %reldir%/scnp-cli_ducker-off.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-off.hw
+TESTS       += %reldir%/scnp-cli_ducker-off.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0_0ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_0_0ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0_0ms.hw
+TESTS       += %reldir%/scnp-cli_ducker-on_0_0ms.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_15_1000ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_15_1000ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_15_1000ms.hw
+TESTS       += %reldir%/scnp-cli_ducker-on_15_1000ms.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_16_1000ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_16_1000ms.sh
-XFAIL_TESTS += %reldir%/scnp-cli_ducker-on_16_1000ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_16_1000ms.nohw
+TESTS       += %reldir%/scnp-cli_ducker-on_16_1000ms.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-on_16_1000ms.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b0000_0ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_0b0000_0ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b0000_0ms.hw
+TESTS       += %reldir%/scnp-cli_ducker-on_0b0000_0ms.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_0ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_0ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_0ms.hw
+TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_0ms.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_5000ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_5000ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_5000ms.hw
+TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_5000ms.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.sh
-TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.sh
-XFAIL_TESTS += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.nohw
+TESTS       += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-on_0b1111_5001ms.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_-10dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-range_-10dB.sh
-XFAIL_TESTS += %reldir%/scnp-cli_ducker-range_-10dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_-10dB.nohw
+TESTS       += %reldir%/scnp-cli_ducker-range_-10dB.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-range_-10dB.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_0dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-range_0dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_0dB.hw
+TESTS       += %reldir%/scnp-cli_ducker-range_0dB.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_90dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-range_90dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_90dB.hw
+TESTS       += %reldir%/scnp-cli_ducker-range_90dB.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_100dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-range_100dB.sh
-XFAIL_TESTS += %reldir%/scnp-cli_ducker-range_100dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-range_100dB.nohw
+TESTS       += %reldir%/scnp-cli_ducker-range_100dB.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-range_100dB.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_10dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-threshold_10dB.sh
-XFAIL_TESTS += %reldir%/scnp-cli_ducker-threshold_10dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_10dB.nohw
+TESTS       += %reldir%/scnp-cli_ducker-threshold_10dB.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-threshold_10dB.nohw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_0dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-threshold_0dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_0dB.hw
+TESTS       += %reldir%/scnp-cli_ducker-threshold_0dB.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_-60dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-threshold_-60dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_-60dB.hw
+TESTS       += %reldir%/scnp-cli_ducker-threshold_-60dB.hw
 
-EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_-70dB.sh
-TESTS       += %reldir%/scnp-cli_ducker-threshold_-70dB.sh
-XFAIL_TESTS += %reldir%/scnp-cli_ducker-threshold_-70dB.sh
+EXTRA_DIST  += %reldir%/scnp-cli_ducker-threshold_-70dB.nohw
+TESTS       += %reldir%/scnp-cli_ducker-threshold_-70dB.nohw
+XFAIL_TESTS += %reldir%/scnp-cli_ducker-threshold_-70dB.nohw
