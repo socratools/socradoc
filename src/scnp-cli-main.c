@@ -802,6 +802,17 @@ void usbdev_meter(usbdev_T *usbdev)
 }
 
 
+static
+void usbdev_check_permissions(usbdev_T *usbdev)
+    __attribute__(( nonnull(1) ));
+
+static
+void usbdev_check_permissions(usbdev_T *usbdev)
+{
+    (void) usbdev;
+}
+
+
 typedef union {
     struct {
         uint8_t source_index;
@@ -880,6 +891,20 @@ void commandfunc_meter(usbdev_T *usbdev,
                        command_params_T *params __attribute__(( unused )) )
 {
     usbdev_meter(usbdev);
+}
+
+
+static
+void commandfunc_check_permissions(usbdev_T *usbdev,
+                                   command_params_T *params)
+    __attribute__(( nonnull(1) ));
+
+static
+void commandfunc_check_permissions(usbdev_T *usbdev,
+                                   command_params_T *params
+                                   __attribute__(( unused )) )
+{
+    usbdev_check_permissions(usbdev);
 }
 
 
@@ -1011,6 +1036,9 @@ void print_usage(const char *const prog)
     }
     printf("               Note that on the NOTEPAD-12FX 4-channel audio capture device,\n"
            "               capture device channels 1+2 are always fed from mixer CH 1+2.\n"
+           "\n"
+           "    check-permissions\n"
+           "               Just open the hardware device, but do not communicate.\n"
            "\n"
            "    ducker-off\n"
            "               Turn off the ducker.\n"
@@ -1382,6 +1410,11 @@ int parse_cmdline(const int argc, const char *const argv[])
         command_params_T params;
         /* no params needed to run the meter */
         run_usbdev_command(commandfunc_meter, &params);
+        return EXIT_SUCCESS;
+    } else if ((argc == 2) && (strcmp(argv[1], "check-permissions") == 0)) {
+        command_params_T params;
+        /* no params needed to just open the device special file */
+        run_usbdev_command(commandfunc_check_permissions, &params);
         return EXIT_SUCCESS;
     } else if ((argc == 2) && (strcmp(argv[1], "ducker-off") == 0)) {
         command_params_T params;
