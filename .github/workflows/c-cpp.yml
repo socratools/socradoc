@@ -32,7 +32,7 @@ jobs:
     - name: make
       run: make
     - name: make check
-      run: make check
+      run: make check VERBOSE=y
     - name: make distcheck
       run: make distcheck
 
@@ -109,7 +109,7 @@ jobs:
         run: make
 
       - name: '${{ matrix.sys }} make check'
-        run: make check
+        run: make check VERBOSE=y
 
       - name: '${{ matrix.sys }} make distcheck'
         run: make distcheck
