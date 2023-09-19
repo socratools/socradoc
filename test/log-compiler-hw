@@ -17,9 +17,11 @@ then
         fi
         sleep 2
     done
+    "$@"
 else
     SCNP_CLI_DRY_RUN='yes'
     export SCNP_CLI_DRY_RUN
+    set -e
+    "$@"
+    exit 77
 fi
-
-"$@"
