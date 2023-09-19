@@ -884,13 +884,13 @@ void commandfunc_meter(usbdev_T *usbdev,
 
 
 static
-void run_command(command_func_T command_func,
-                 command_params_T *command_params)
+void run_usbdev_command(command_func_T command_func,
+                        command_params_T *command_params)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void run_command(command_func_T command_func,
-                 command_params_T *command_params)
+void run_usbdev_command(command_func_T command_func,
+                        command_params_T *command_params)
 {
     const int luret_init =
         libusb_init(NULL);
@@ -1080,7 +1080,7 @@ int parse_command_audio_routing(const char *const param_sources)
     command_params_T params;
     params.audio_routing.source_index = source_index;
 
-    run_command(commandfunc_audio_routing, &params);
+    run_usbdev_command(commandfunc_audio_routing, &params);
     return EXIT_SUCCESS;
 }
 
@@ -1169,7 +1169,7 @@ int parse_command_ducker_on(const char *const param_inputs,
         params.ducker_on.release_ms = (uint16_t) lval;
     }
 
-    run_command(commandfunc_ducker_on, &params);
+    run_usbdev_command(commandfunc_ducker_on, &params);
     return EXIT_SUCCESS;
 }
 
@@ -1227,7 +1227,7 @@ int parse_command_ducker_range(const char *const param_range)
         return EXIT_FAILURE;
     }
 
-    run_command(commandfunc_ducker_range, &params);
+    run_usbdev_command(commandfunc_ducker_range, &params);
     return EXIT_SUCCESS;
 }
 
@@ -1285,7 +1285,7 @@ int parse_command_ducker_threshold(const char *const param_threshold)
         return EXIT_FAILURE;
     }
 
-    run_command(commandfunc_ducker_threshold, &params);
+    run_usbdev_command(commandfunc_ducker_threshold, &params);
     return EXIT_SUCCESS;
 }
 
@@ -1381,12 +1381,12 @@ int parse_cmdline(const int argc, const char *const argv[])
     } else if ((argc == 2) && (strcmp(argv[1], "meter") == 0)) {
         command_params_T params;
         /* no params needed to run the meter */
-        run_command(commandfunc_meter, &params);
+        run_usbdev_command(commandfunc_meter, &params);
         return EXIT_SUCCESS;
     } else if ((argc == 2) && (strcmp(argv[1], "ducker-off") == 0)) {
         command_params_T params;
         /* no params needed to turn off ducker  */
-        run_command(commandfunc_ducker_off, &params);
+        run_usbdev_command(commandfunc_ducker_off, &params);
         return EXIT_SUCCESS;
     } else if ((argc == 4) && (strcmp(argv[1], "ducker-on") == 0)) {
         return parse_command_ducker_on(argv[2], argv[3]);
