@@ -872,7 +872,7 @@ void commandfunc_ducker_threshold(usbdev_T *usbdev,
 
 static
 void commandfunc_meter(usbdev_T *usbdev,
-                       command_params_T *params __attribute__(( unused )) )
+                       command_params_T *params)
     __attribute__(( nonnull(1) ));
 
 static
