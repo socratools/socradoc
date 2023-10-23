@@ -1,0 +1,5 @@
+#!/bin/sh
+
+doc_srcdir="${top_srcdir-.}/doc"
+
+${ASPELL-aspell} pipe --dont-backup --add-wordlists="${doc_srcdir}/wordlist.txt" --mode=markdown --lang=en_US < "${doc_srcdir}/soundcraft-notepad-usb-protocol.md"

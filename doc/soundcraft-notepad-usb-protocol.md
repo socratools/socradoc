@@ -1,7 +1,7 @@
 The Soundcraft Notepad USB protocol
 ===================================
 
-This document describes the Soundcraft's Notepad series of mixers and
+This document describes the Soundcraft Notepad series of mixers and
 how the USB protocol between the **Soundcraft USB audio control panel**
 and the Soundcraft Notepad series mixer appears to work.
 
@@ -99,7 +99,7 @@ default values: audio routing is set to "Mix L+R", and ducking is off.
 If you then re-enable ducking with a `ducker on/off` command, the range
 and threshold appear to have been reset to reasonable default values.
 
-This behaviour suggests that the mixer has no persistent storage for
+This behavior suggests that the mixer has no persistent storage for
 any state. (Avoiding persistent state in the mixer device also makes
 sense from device design, user experience, and user support
 perspectives.)
@@ -237,7 +237,7 @@ ducker probably are two as well:
 
 TODO: verify number of and encoding of input channels on NP-5, NP-8FX
 
-In any case, the behaviour of the ducker very much depends on the last
+In any case, the behavior of the ducker very much depends on the last
 `audio routing` command for the source of the signal to duck the USB
 playback for.
 

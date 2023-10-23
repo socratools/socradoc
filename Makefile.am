@@ -22,6 +22,10 @@ XFAIL_TESTS =
 
 ########################################################################
 
+TESTS_ENVIRONMENT = env
+
+########################################################################
+
 include build-helpers/package-version.mk
 
 include Makefile-files

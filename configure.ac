@@ -50,6 +50,7 @@ AC_PROG_INSTALL
 ########################################################################
 
 m4_pattern_forbid([^NDIM_PATH_PROG])dnl
+NDIM_PATH_PROG([aspell])
 NDIM_PATH_PROG([git])
 dnl NDIM_PATH_PROG([lsusb])
 dnl NDIM_PATH_PROG([wc])

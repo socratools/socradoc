@@ -1,3 +1,12 @@
 # -*- makefile -*-
 
 dist_doc_DATA += %reldir%/soundcraft-notepad-usb-protocol.md
+
+TESTS_ENVIRONMENT += ASPELL=$(ASPELL)
+TESTS_ENVIRONMENT += top_srcdir=$(top_srcdir)
+
+EXTRA_DIST += %reldir%/spellcheck
+EXTRA_DIST += %reldir%/wordlist.txt
+if HAVE_ASPELL
+TESTS += %reldir%/spellcheck
+endif
