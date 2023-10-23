@@ -124,10 +124,10 @@ audio channels are routed to the USB capture device.
 
 On the 2/2 channel USB capture devices Notepad-5 and Notepad-8FX, the
 two selected channels go to the two channels of the USB capture
-device. On the 4/4 channel USB capture device Notepad-12FX, you can
-select the two mixer channels going to USB capture device channels
-3+4, but the USB capture device channels 1+2 are always fixed to
-MIC 1 + MIC 2.
+device. On the 4/4 channel USB capture device Notepad-12FX, the USB
+capture device channels 1+2 are always fixed to MIC 1 + MIC 2, and you
+can select the two mixer channels going to USB capture device channels
+3+4.
 
      0  1  2  3  4  5  6  7
     00 00 04 00 00 00 00 00
@@ -138,7 +138,8 @@ MIC 1 + MIC 2.
 
     The unlabeled bytes have always been observed to be 0x00.
 
-Table of possible audio sources for the Notepad-5:
+Table of possible audio sources for Notepad-5 USB capture device
+channels 1+2:
 
     index     device label     description from the manual
     0         MIC 1 + LINE 2   Mic Input 1 + Mono line input 2
@@ -146,7 +147,8 @@ Table of possible audio sources for the Notepad-5:
     2         LINE 4/5         Stereo Input 4+5
     3         MASTER L+R       Mix L+R
 
-Table of possible audio sources for the Notepad-8FX:
+Table of possible audio sources for Notepad-8FX USB capture device
+channels 1+2:
 
     index     device label     descriptions from the manual
     0         MIC 1+2          Mic inputs 1+2
@@ -154,7 +156,8 @@ Table of possible audio sources for the Notepad-8FX:
     2         LINE 5/6         Stereo input 5+6
     3         MASTER L+R       Mix L+R
 
-Table of possible audio sources for the Notepad-12FX:
+Table of possible audio sources for Notepad-12FX USB capture device
+channels 3+4:
 
     index     device label     descriptions from the manual
     0         MIC 3+4          Mic input 3+4
@@ -173,8 +176,8 @@ Ducker
 The Notepad's ducker feature can duck the signal from the USB playback
 channels 1+2 (on the Notepad-12FX four channel USB playback device,
 USB playback channels 3+4 are not ducked) when it detects a signal on
-any combination of the so-called "input" channels which are the
-channels which are going to the USB audio capture device.
+any combination of the so-called "input" channels which are the two
+audio channels which are going to the USB audio capture device.
 
 The ducker is not mentioned at all in the user manual for the Notepad
 series of mixers, but it can be turned on and off and its parameters
