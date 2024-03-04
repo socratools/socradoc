@@ -45,10 +45,10 @@ jobs:
       # fail-fast: false
       matrix:
         include:
-          - { sys: mingw32, env: i686 }
+          # - { sys: mingw32, env: i686 }
           - { sys: mingw64, env: x86_64 }
-          # - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
-          # - { sys: clang64, env: clang-x86_64 } # Experimental!
+          - { sys: ucrt64,  env: ucrt-x86_64 }  # Experimental!
+          - { sys: clang64, env: clang-x86_64 } # Experimental!
 
     name: ${{ matrix.sys }} build
 
