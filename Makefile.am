@@ -52,6 +52,7 @@ sed_commands += -e 's|[@]docdir@|$(docdir)|g'
 
 .1in.1:
 	@$(MKDIR_P) $(@D)
+	@echo "substituting $< to $@"; \
 	set -e; \
 	$(SED) $(sed_commands) $< > $@.$$$$.new; \
 	if grep -v '^\.\\"' $< | grep '[^\]-'; then \
