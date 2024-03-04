@@ -152,6 +152,12 @@ For building from a git source tree, you also need at least
   * automake
   * autoconf
 
+So e.g. on Ubuntu, you will need to run something like
+
+```
+sudo apt-get install libusb-1.0-0-dev git pkgconf bash-completion gcc make automake
+```
+
 
 Building
 --------
@@ -160,6 +166,8 @@ When building from a git source tree (or one of the github "release"
 tarballs (`*.tar.gz`) or zipfiles (`*.zip`), which I wholeheartedly
 recommend to NOT use):
 
+    git clone https://github.com/socratools/socradoc.git
+    cd socradoc
     autoreconf -vis .
 
 Then you can run the usual build commands as if you had unpacked a
