@@ -419,13 +419,13 @@ const notepad_device_T *notepad_device_from_idProduct(const uint16_t idProduct)
 
 
 static
-void device_recv_ctrl_message(libusb_device_handle *device_handle,
-                              uint8_t *data, const size_t data_size)
+void ludh_recv_ctrl_message(libusb_device_handle *device_handle,
+                            uint8_t *data, const size_t data_size)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_recv_ctrl_message(libusb_device_handle *device_handle,
-                              uint8_t *data, const size_t data_size)
+void ludh_recv_ctrl_message(libusb_device_handle *device_handle,
+                            uint8_t *data, const size_t data_size)
 {
     COND_OR_FAIL(data_size < UINT16_MAX, "data_size exceeds uint16_t range");
     const uint16_t u16_data_size = (uint16_t) data_size;
@@ -457,7 +457,7 @@ void device_recv_ctrl_message(libusb_device_handle *device_handle,
     }
 
 #if 0
-    printf("device_recv_ctrl_message got"
+    printf("ludh_recv_ctrl_message got"
            " {%02x %02x %02x %02x %02x %02x %02x %02x}%s\n",
            data[0], data[1], data[2], data[3],
            data[4], data[5], data[6], data[7],
@@ -467,13 +467,13 @@ void device_recv_ctrl_message(libusb_device_handle *device_handle,
 
 
 static
-void device_send_ctrl_message(libusb_device_handle *device_handle,
-                              uint8_t *data, const size_t data_size)
+void ludh_send_ctrl_message(libusb_device_handle *device_handle,
+                            uint8_t *data, const size_t data_size)
     __attribute__(( nonnull(1), nonnull(2) ));
 
 static
-void device_send_ctrl_message(libusb_device_handle *device_handle,
-                              uint8_t *data, const size_t data_size)
+void ludh_send_ctrl_message(libusb_device_handle *device_handle,
+                            uint8_t *data, const size_t data_size)
 {
     COND_OR_FAIL(data_size < UINT16_MAX, "data_size exceeds uint16_t range");
     const uint16_t u16_data_size = (uint16_t) data_size;
@@ -534,7 +534,7 @@ void usbdev_audio_routing(usbdev_T *usbdev, const uint8_t src_idx)
     data[6] = 0x00;
     data[7] = 0x00;
 
-    device_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
+    ludh_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
 }
 
 
@@ -557,7 +557,7 @@ void usbdev_ducker_off(usbdev_T *usbdev)
     data[6] = 0x00;
     data[7] = 0x00;
 
-    device_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
+    ludh_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
 }
 
 
@@ -586,7 +586,7 @@ void usbdev_ducker_on(usbdev_T *usbdev,
     data[6] = ((release_ms>>8) & 0xff);
     data[7] = ((release_ms>>0) & 0xff);
 
-    device_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
+    ludh_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
 }
 
 
@@ -614,7 +614,7 @@ void usbdev_ducker_range(usbdev_T *usbdev,
     data[6] = ((range_value>> 8) & 0xff);
     data[7] = ((range_value>> 0) & 0xff);
 
-    device_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
+    ludh_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
 }
 
 
@@ -642,7 +642,7 @@ void usbdev_ducker_threshold(usbdev_T *usbdev,
     data[6] = ((thresh_value>> 8) & 0xff);
     data[7] = ((thresh_value>> 0) & 0xff);
 
-    device_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
+    ludh_send_ctrl_message(usbdev->device_handle, data, sizeof(data));
 }
 
 
@@ -696,7 +696,7 @@ void usbdev_meter(usbdev_T *usbdev)
     printf("uintval   dB    bar graph\n");
 
     while (true) {
-        device_recv_ctrl_message(usbdev->device_handle, data, sizeof(data));
+        ludh_recv_ctrl_message(usbdev->device_handle, data, sizeof(data));
         const uint32_t cur_value =
             (((uint32_t)data[0])<< 0) |
             (((uint32_t)data[1])<< 8) |
