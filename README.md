@@ -192,6 +192,21 @@ Note that if you run `make check` or `make distcheck` and there is
 actually a Notepad series mixer connected, one of the test cases will
 write to the device and possibly change its settings.
 
+We have two special targets to install bash-completion files to the
+well-known bash-completion directories:
+
+    make install-bashcompletion-rules
+
+If those installations would happen to a system wide directory
+writable only by root, you can run these targets separately from the
+remaining installation with sudo:
+
+    sudo make install-bashcompletion-rules
+
+The corresponding uninstall target also exists:
+
+    make uninstall-bashcompletion-rules
+
 
 Device permission setup on Linux using udev
 ===========================================

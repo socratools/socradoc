@@ -1,4 +1,21 @@
 # -*- makefile -*-
 
-EXTRA_DIST          += %reldir%/scnp-cli
-bashcompletion_DATA += %reldir%/scnp-cli
+# bashcompletiondir is a well-known directory independent from our
+# installation prefix, so we use a separate install target which can
+# be run separately from "make install".
+
+bashcompletion_files =
+
+EXTRA_DIST           += %reldir%/scnp-cli
+bashcompletion_files += %reldir%/scnp-cli
+
+install-bashcompletion-data:
+	$(INSTALL) -m 0755 -d "$(DESTDIR)$(bashcompletiondir)"
+	@set -ex; for file in $(bashcompletion_files); do \
+	$(INSTALL) -m 0644 -t "$(DESTDIR)$(bashcompletiondir)" `test -f "$$file" || echo "$(srcdir)/"`"$$file"; \
+	done
+
+uninstall-bashcompletion-data:
+	@set -ex; for file in $(bashcompletion_files); do \
+	  rm -f "$(DESTDIR)$(udevrulesdir)/$$(basename "$$file")"; \
+	done

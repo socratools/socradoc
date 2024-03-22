@@ -1,7 +1,8 @@
 # -*- makefile -*-
 
-# This is a well-known directory independent from our installation
-# prefix.
+# udevrulesdir is a well-known directory independent from our
+# installation prefix, so we use a separate install target which can
+# be run separately from "make install".
 
 # For system packages
 # udevrulesdir = /usr/lib/udev/rules.d
