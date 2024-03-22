@@ -41,8 +41,8 @@ mixer devices.
 General packet format
 =====================
 
-Changing the mixer settings works by the USB host sending a 8 byte USB
-control OUT request packet to the mixer's endpoint 0.  The control
+Changing the mixer settings works by the USB host sending an 8 byte
+USB control OUT request packet to the mixer's endpoint 0.  The control
 requests we have observed all have the following properties:
 
     USB Control OUT transfer with
@@ -79,13 +79,14 @@ Mixer state vs host software state
 ==================================
 
 We have not observed the **Soundcraft USB audio control panel** query
-any information from the mixer.
+any settings information from the mixer.
 
-On starting the "Soundcraft USB audio control panel", no USB requests
-can be observed which query the mixer state. However, the "Soundcraft
-USB audio control panel" remembers the last state it set the mixer to
-when it is started the next time, which means that some software
-component must keep track of the state the mixer has been set to.
+On starting the **Soundcraft USB audio control panel**, no USB
+requests can be observed which query the mixer state. However, the
+**Soundcraft USB audio control panel** remembers the last state it has
+set the mixer to when it is started the next time, which means that
+some software component must keep track of the state the mixer has
+been set to.
 
 When the mixer state is changed via USB commands, such as
 
@@ -173,11 +174,13 @@ and Notepad-12FX.
 Ducker
 ======
 
-The Notepad's ducker feature can duck the signal from the USB playback
-channels 1+2 (on the Notepad-12FX four channel USB playback device,
-USB playback channels 3+4 are not ducked) when it detects a signal on
-any combination of the so-called "input" channels which are the two
-audio channels which are going to the USB audio capture device.
+The Notepad mixer's ducker feature can duck the signal from the USB
+playback channels 1+2 when it detects a signal on any combination of
+the so-called "input" channels which are the two audio channels which
+are going to the USB audio capture device.
+
+On the Notepad-12FX with its four channel USB playback device, USB
+playback channels 3+4 are not ducked.
 
 The ducker is not mentioned at all in the user manual for the Notepad
 series of mixers, but it can be turned on and off and its parameters
@@ -230,7 +233,7 @@ four channels which are available on the USB capture device:
 
 The Notepad-5 and Notepad-8FX have only two input channels on the USB
 audio capture device, so the number of input selection options for the
-ducker probably are two as well:
+ducker **probably** are two as well:
 
     0b0001  1  INPUT 1
     0b0010  2  INPUT 2
@@ -251,7 +254,7 @@ TODO: What is a reasonable ms release value a GUI could start with?
 `ducker range` command
 ----------------------
 
-CONTROL OUT message with endpoint 0 setting the "duck range":
+The "ducker range" command configures the "duck range" value:
 
      0  1  2  3  4  5  6  7
     00 00 02 81 00 00 4a 67
@@ -299,7 +302,7 @@ TODO: What is a reasonable dB range value a GUI could start with?
 `ducker threshold` command
 --------------------------
 
-CONTROL OUT message with endpoint 0 setting the "threshold":
+The "ducker threshold" command configures the ducker "threshold" value.
 
      0  1  2  3  4  5  6  7
     00 00 02 82 00 7f ff ff
@@ -364,9 +367,9 @@ protocol which uses a multibyte value in LITTLE ENDIAN.
     ┗━━━━━━━━━┩
               ╰────────────── meter value in LITTLE ENDIAN!
                               observed range:
-                                * 0x0000008e .. 0x010007bd (stereo input)
-                                * 0x0000009e .. 0x00800000 (mono input)
                                 * continuously 0x00000000 while ducker is off
+                                * 0x0000009e .. 0x00800000 (mono input)
+                                * 0x0000008e .. 0x010007bd (stereo input)
 
     The unlabeled bytes have always been observed to be 0x00.
 
