@@ -3,8 +3,9 @@
 ########################################################################
 
 AC_PREREQ([2.69])
+m4_define([sd_version], m4_esyscmd([./build-helpers/package-version . version-stamp]))
 AC_INIT([Documentation for the Soundcraft Notepad series],
-        [m4_esyscmd([./build-helpers/package-version . version-stamp])],
+        [m4_defn([sd_version])],
         [https://github.com/socratools/socradoc/issues],
         [socradoc],
         [https://github.com/socratools/socradoc])
