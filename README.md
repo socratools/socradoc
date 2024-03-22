@@ -235,3 +235,16 @@ In any case, if you have installed or uninstalled and udev rules, the
 permissions of any existing device special files do not change
 according to the new set of rules until you **unplug and re-plug the
 USB cable** to your mixer device(s).
+
+
+Contact
+=======
+
+If this contains any mistakes, leaves any questions open, or you want
+to contact us about anything else related to the protocol
+documentation or the `scnp-cli` tool, please file an issue at
+https://github.com/socratools/socradoc/issues.
+
+To chat with us on IRC, join the
+[#socratools](https://web.libera.chat/?channel=#socratools) channel on
+[libera.chat](https://libera.chat).
