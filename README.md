@@ -23,18 +23,26 @@ following three devices:
   * [Notepad-12FX](https://www.soundcraft.com/en/products/notepad-12fx)
     with 4/4 channel USB audio
 
-[doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
-describes how to tell a [Soundcraft Notepad
-series](https://www.soundcraft.com/en/product_families/notepad-series)
-mixer device which audio channels to route to the USB capture device,
-whether and how to configure the Ducker for the USB playback, and also
-gives some context about what is probably going on inside the Notepad
-mixer.
+The socradoc repository consists of two main parts:
 
-The `scnp-cli` utility is a simple CLI written in C which implements
-the USB control commands described in
-[doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
-to help verify the protocol description is accurate.
+  * [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
+    describes how to tell a [Soundcraft Notepad
+    series](https://www.soundcraft.com/en/product_families/notepad-series)
+    mixer device which audio channels to route to the USB capture
+    device, whether and how to configure the Ducker for the USB
+    playback, and also gives some context about what is probably going
+    on inside the Notepad mixer.
+
+  * The `scnp-cli` utility is a simple CLI written in C which
+    implements the USB control commands described in
+    [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
+    to help verify the protocol description is accurate.
+
+    `scnp-cli` can be helpful if you do not want to install the whole
+    Python software stack just to change the mixer's audio routing to
+    the USB device. However, the primary goal of `scnp-cli` is to
+    demonstrate the accuracy of the information in the documentation,
+    not to be a proper user interface.
 
 If you want a nice GUI for controlling a Notepad mixer but Soundcraft
 does not provide one for your computer's operating system, our sister
@@ -45,12 +53,6 @@ of its GUI and CLI.
 [socranop](https://github.com/socratools/socranop) is written in
 Python, uses a D-Bus service to provide a better user experience
 across tool invocations, and uses Gtk3 for the GUI.
-
-`scnp-cli` on the other hand could be helpful if you do not want to
-install the whole Python software stack just to change the mixer's
-audio routing to the USB device. However, the primary goal of
-`scnp-cli` is to demonstrate the accuracy of the information in the
-documentation, not to be a proper user interface.
 
 
 The `scnp-cli` utility
