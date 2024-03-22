@@ -214,7 +214,7 @@ To help with that, we have two udev rules files:
     Sets the device file's group to `audio` to allow all group members
     access.
 
-Check whether these udev rule files are suitable for your system
+Check whether these udev rules files are suitable for your system
 before installing them. You can very well have both installed at the
 same time.
 
