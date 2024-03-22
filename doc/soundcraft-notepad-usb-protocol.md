@@ -348,6 +348,11 @@ TODO: What is a reasonable dB threshold value a GUI could start with?
 `ducker meter` query
 --------------------
 
+The ducker meter measures the amplitude of the input channels which
+control the ducker. TODO: That might just be the sum of all the (up to
+four) input channels the ducker observes in order to duck the output
+signal.
+
 It appears that to show the meter bar graph in the GUI, the
 **Soundcraft USB audio control panel** just issues a USB Ctrl IN
 Request every 0.05s where the 8 byte reply buffer then contains the
@@ -381,6 +386,10 @@ plausible:
                           ╰  0x01000000  ╯
 
 TODO: Need confirmation from GUI of meter range in uint32 and dB.
+
+TODO: What is the range with 3 or 4 observed input channels? Do we
+      need to divide the received meter_uint value by the number of
+      observed input channels?
 
 With the inverse function mapping dB values to integer values being
 
