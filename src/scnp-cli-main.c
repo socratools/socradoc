@@ -1432,9 +1432,12 @@ int parse_cmdline(const int argc, const char *const argv[])
 }
 
 
-int main(const int argc, const char *const argv[])
+static
+void init_dry_run_from_env(void);
+
+static
+void init_dry_run_from_env(void)
 {
-    detect_output_charset();
     const char *const env_scnp_cli_dry_run = getenv("SCNP_CLI_DRY_RUN");
     if (env_scnp_cli_dry_run && (*env_scnp_cli_dry_run != '\0')) {
         dry_run = true;
@@ -1447,6 +1450,12 @@ int main(const int argc, const char *const argv[])
             }
         }
     }
+}
 
+
+int main(const int argc, const char *const argv[])
+{
+    detect_output_charset();
+    init_dry_run_from_env();
     return parse_cmdline(argc, argv);
 }
