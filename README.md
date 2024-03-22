@@ -194,8 +194,8 @@ actually a Notepad series mixer connected, one of the test cases will
 write to the device and possibly change its settings.
 
 
-Device permission setup using udev
-==================================
+Device permission setup on Linux using udev
+===========================================
 
 `scnp-cli` writes to the mixer device by opening the device special
 file connected to the mixer, which is called something like
