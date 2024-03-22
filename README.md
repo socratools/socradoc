@@ -26,12 +26,11 @@ following three devices:
 The socradoc repository consists of two main parts:
 
   * [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
-    describes how to tell a [Soundcraft Notepad
-    series](https://www.soundcraft.com/en/product_families/notepad-series)
-    mixer device which audio channels to route to the USB capture
-    device, whether and how to configure the Ducker for the USB
-    playback, and also gives some context about what is probably going
-    on inside the Notepad mixer.
+    describes how to tell a Soundcraft Notepad series mixer device
+    which audio channels to route to the USB capture device, whether
+    and how to configure the Ducker for the USB playback, and also
+    gives some context about what is probably going on inside the
+    Notepad mixer.
 
   * The `scnp-cli` utility is a simple CLI written in C which
     implements the USB control commands described in
