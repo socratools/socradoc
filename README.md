@@ -23,18 +23,26 @@ following three devices:
   * [Notepad-12FX](https://www.soundcraft.com/en/products/notepad-12fx)
     with 4/4 channel USB audio
 
-[doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
-describes how to tell a [Soundcraft Notepad
-series](https://www.soundcraft.com/en/product_families/notepad-series)
-mixer device which audio channels to route to the USB capture device,
-whether and how to configure the Ducker for the USB playback, and also
-gives some context about what is probably going on inside the Notepad
-mixer.
+The socradoc repository consists of two main parts:
 
-The `scnp-cli` utility is a simple CLI written in C which implements
-the USB control commands described in
-[doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
-to help verify the protocol description is accurate.
+  * [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
+    describes how to tell a [Soundcraft Notepad
+    series](https://www.soundcraft.com/en/product_families/notepad-series)
+    mixer device which audio channels to route to the USB capture
+    device, whether and how to configure the Ducker for the USB
+    playback, and also gives some context about what is probably going
+    on inside the Notepad mixer.
+
+  * The `scnp-cli` utility is a simple CLI written in C which
+    implements the USB control commands described in
+    [doc/soundcraft-notepad-usb-protocol.md](doc/soundcraft-notepad-usb-protocol.md)
+    to help verify the protocol description is accurate.
+
+    `scnp-cli` can be helpful if you do not want to install the whole
+    Python software stack just to change the mixer's audio routing to
+    the USB device. However, the primary goal of `scnp-cli` is to
+    demonstrate the accuracy of the information in the documentation,
+    not to be a proper user interface.
 
 If you want a nice GUI for controlling a Notepad mixer but Soundcraft
 does not provide one for your computer's operating system, our sister
@@ -45,12 +53,6 @@ of its GUI and CLI.
 [socranop](https://github.com/socratools/socranop) is written in
 Python, uses a D-Bus service to provide a better user experience
 across tool invocations, and uses Gtk3 for the GUI.
-
-`scnp-cli` on the other hand could be helpful if you do not want to
-install the whole Python software stack just to change the mixer's
-audio routing to the USB device. However, the primary goal of
-`scnp-cli` is to demonstrate the accuracy of the information in the
-documentation, not to be a proper user interface.
 
 
 The `scnp-cli` utility
@@ -192,8 +194,8 @@ actually a Notepad series mixer connected, one of the test cases will
 write to the device and possibly change its settings.
 
 
-Device permission setup using udev
-==================================
+Device permission setup on Linux using udev
+===========================================
 
 `scnp-cli` writes to the mixer device by opening the device special
 file connected to the mixer, which is called something like
@@ -206,15 +208,13 @@ such that an ordinary user can access it.
 
 To help with that, we have two udev rules files:
 
-  * 70-soundcraft-notepad.rules 
-    Uses the `TAG+="uaccess"` mechanism to allow access users locally
-    logged into a login session.
+  * `70-soundcraft-notepad.rules` uses the `TAG+="uaccess"` mechanism
+    to allow access users locally logged into a login session.
 
-  * 80-soundcraft-notepad.rules 
-    Sets the device file's group to `audio` to allow all group members
-    access.
+  * `80-soundcraft-notepad.rules` sets the device file's group to
+    `audio` to allow all group members access.
 
-Check whether these udev rule files are suitable for your system
+Check whether these udev rules files are suitable for your system
 before installing them. You can very well have both installed at the
 same time.
 
@@ -235,3 +235,16 @@ In any case, if you have installed or uninstalled and udev rules, the
 permissions of any existing device special files do not change
 according to the new set of rules until you **unplug and re-plug the
 USB cable** to your mixer device(s).
+
+
+Contact
+=======
+
+If this contains any mistakes, leaves any questions open, or you want
+to contact us about anything else related to the protocol
+documentation or the `scnp-cli` tool, please file an issue at
+https://github.com/socratools/socradoc/issues.
+
+To chat with us on IRC, join the
+[#socratools](https://web.libera.chat/?channel=#socratools) channel on
+[libera.chat](https://libera.chat).
