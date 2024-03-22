@@ -206,13 +206,11 @@ such that an ordinary user can access it.
 
 To help with that, we have two udev rules files:
 
-  * 70-soundcraft-notepad.rules 
-    Uses the `TAG+="uaccess"` mechanism to allow access users locally
-    logged into a login session.
+  * `70-soundcraft-notepad.rules` uses the `TAG+="uaccess"` mechanism
+    to allow access users locally logged into a login session.
 
-  * 80-soundcraft-notepad.rules 
-    Sets the device file's group to `audio` to allow all group members
-    access.
+  * `80-soundcraft-notepad.rules` sets the device file's group to
+    `audio` to allow all group members access.
 
 Check whether these udev rules files are suitable for your system
 before installing them. You can very well have both installed at the
